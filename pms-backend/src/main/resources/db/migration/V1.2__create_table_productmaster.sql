@@ -5,7 +5,7 @@ CREATE TABLE product_master(
     product_name    VARCHAR(100)   NOT NULL                       COMMENT '제품명',
     product_created DATETIME                                      COMMENT '제품생산일자',
     price           DECIMAL(10,2)                                 COMMENT '제품단가',
-    used            CHAR(1)        NOT NULL DEFAULT  'Y'          COMMENT '사용여부',
+    used            CHAR(1)        NOT NULL                       COMMENT '사용여부',
     address         VARCHAR(255)                                  COMMENT '제품생산지주소',
     created_at      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP  COMMENT '등록일자',
     updated_at      DATETIME       DEFAULT  NULL ON UPDATE  CURRENT_TIMESTAMP  COMMENT '수정일자',

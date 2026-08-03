@@ -1,6 +1,7 @@
-package neoinfos.pms.service;/**
+import static org.junit.jupiter.api.Assertions.*;
+/**
  *packageName    : neoinfos.pms.service
- * fileName       : ProductMasterServcie
+ * fileName       : CategoryServiceImplTest
  * author         : JAEIK
  * date           : 8/3/26
  * description    :
@@ -8,5 +9,6 @@ package neoinfos.pms.service;/**
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 8/3/26        JAEIK       최초 생성
- */public interface ProductMasterServcie {
+ */class CategoryServiceImplTest {
+  
 }

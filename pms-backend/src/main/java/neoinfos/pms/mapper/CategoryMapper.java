@@ -1,8 +1,6 @@
-package neoinfos.pms.service;
-
-/**
- * packageName    : neoinfos.pms.service
- * fileName       : ProductMasterService
+package neoinfos.pms.mapper;/**
+ *packageName    : neoinfos.pms.mapper
+ * fileName       : categoryMapper
  * author         : JAEIK
  * date           : 8/3/26
  * description    :
@@ -10,6 +8,5 @@ package neoinfos.pms.service;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 8/3/26        JAEIK       최초 생성
- */
-public class ProductMasterServiceImp {
+ */public class categoryMapper {
 }

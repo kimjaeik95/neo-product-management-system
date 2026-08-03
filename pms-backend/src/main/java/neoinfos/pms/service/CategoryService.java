@@ -20,4 +20,6 @@ public interface CategoryService {
     CategoryResponse createCategory(CategoryRequest categoryRequest);
 
     List<CategoryResponse> findAllCategory();
+
+    CategoryResponse findCategoryById(Long categoryNo);
 }

@@ -8,6 +8,7 @@ import neoinfos.pms.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,12 @@ public class CategoryController {
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryResponse>> getCategories() {
         List<CategoryResponse> category = categoryService.findAllCategory();
+        return ResponseEntity.ok().body(category);
+    }
+
+    @GetMapping("/categories/{categoryNo}")
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long categoryNo) {
+        CategoryResponse category = categoryService.findCategoryById(categoryNo);
         return ResponseEntity.ok().body(category);
     }
 }

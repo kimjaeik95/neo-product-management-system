@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -109,7 +111,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    @DisplayName("카테고리 목록을 반환한다")
+    @DisplayName("제품분류 목록을 반환한다")
     void findAllCategory_success() {
         // given
         Category category1 = Category.builder().categoryCode("CATE001").categoryName("의류").build();
@@ -128,5 +130,39 @@ class CategoryServiceImplTest {
         // then
         assertThat(result).hasSize(2);
         assertThat(result).extracting("categoryCode").containsExactly("CATE001", "CATE002");
+    }
+
+    @Test
+    @DisplayName("categoryNo로 제품분류 단건 조회하여 반환한다")
+    void findCategoryById_success() {
+        // given
+        Long categoryNo = 1L;
+        Category category = Category.builder().categoryNo(categoryNo).categoryCode("CATE001").categoryName("의류").build();
+        CategoryResponse response = CategoryResponse.builder().categoryNo(categoryNo).categoryCode("CATE001").categoryName("의류").build();
+
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.of(category));
+        given(categoryMapper.toDto(category)).willReturn(response);
+
+        // when
+        CategoryResponse result = categoryService.findCategoryById(categoryNo);
+
+        // then
+        assertThat(result.getCategoryNo()).isEqualTo(categoryNo);
+        assertThat(result.getCategoryCode()).isEqualTo("CATE001");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 categoryNo면 예외를 던진다")
+    void findCategoryById_notFound() {
+        // given
+        Long categoryNo = 999L;
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> categoryService.findCategoryById(categoryNo))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("제품분류가 존재하지 않습니다 :" + categoryNo);
+
+        verify(categoryMapper, never()).toDto(any());
     }
 }

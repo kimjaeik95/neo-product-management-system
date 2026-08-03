@@ -96,6 +96,19 @@ public class CategoryControllerIntegrationTest {
                 .andExpect(jsonPath("$[*].categoryCode")
                         .value(hasItems("CATE001", "CATE002")));
     }
+
+    @Test
+    @DisplayName("존재하는 categoryNo로 조회하면 정상 응답을 반환한다")
+    void getCategoryById_success() throws Exception {
+        // given
+        Category saved = categoryRepository.save(
+                Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build());
+
+        // when & then
+        mockMvc.perform(get("/api/categories/{categoryNo}", saved.getCategoryNo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categoryCode").value("CATE001"));
+    }
 }
 
 

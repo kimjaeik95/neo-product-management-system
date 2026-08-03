@@ -10,6 +10,7 @@ import neoinfos.pms.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -49,5 +50,14 @@ public class CategoryServiceImpl implements CategoryService {
         return categories.stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CategoryResponse findCategoryById(Long categoryNo) {
+        Category category = categoryRepository.findById(categoryNo)
+                .orElseThrow(() -> new NoSuchElementException("제품분류가 존재하지 않습니다 :" + categoryNo));
+
+        return categoryMapper.toDto(category);
+
     }
 }

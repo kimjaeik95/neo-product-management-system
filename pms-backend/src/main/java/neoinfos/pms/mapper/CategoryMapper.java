@@ -34,6 +34,8 @@ public class CategoryMapper {
                 .used(category.getUsed())
                 .createdAt(category.getCreatedAt())
                 .updatedAt(category.getUpdatedAt())
+                .deletedYn(category.getDeleteYn())
+                .deletedAt(category.getDeletedAt())
                 .build();
     }
 }

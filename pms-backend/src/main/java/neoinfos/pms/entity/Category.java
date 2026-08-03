@@ -54,8 +54,21 @@ public class Category {
     )
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(
+            name = "updated_at",
+            insertable = false,
+            updatable = false
+    )
     private LocalDateTime updatedAt;
+
+    @Column(
+            name = "deleted_yn",
+            insertable = false
+    )
+    private String deleteYn;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public void updateCategory(String categoryCode, String categoryName, String used) {
         this.categoryCode = categoryCode;

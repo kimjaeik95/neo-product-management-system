@@ -34,6 +34,10 @@ public class CategoryResponse {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private String deletedYn;
+
+    private LocalDateTime deletedAt;
 }
 
 

@@ -9,6 +9,7 @@ import neoinfos.pms.entity.Category;
 import neoinfos.pms.mapper.CategoryMapper;
 import neoinfos.pms.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
+    @Transactional
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         if (categoryRepository.existsByCategoryCode(categoryRequest.getCategoryCode())) {
             throw new DuplicateRequestException("중복된 제품분류 코드입니다.");
@@ -45,6 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> findAllCategory() {
         List<Category> categories = categoryRepository.findAll();
 
@@ -54,6 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponse findCategoryById(Long categoryNo) {
         Category category = categoryRepository.findById(categoryNo)
                 .orElseThrow(() -> new NoSuchElementException("제품분류가 존재하지 않습니다 :" + categoryNo));
@@ -63,6 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryResponse updateCategoryById(Long categoryNo, CategoryUpdateRequest updateRequest) {
         Category category = categoryRepository.findById(categoryNo)
                 .orElseThrow(() -> new NoSuchElementException("제품분류가 존재하지 않습니다 :" + categoryNo));
@@ -80,5 +85,14 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(category);
 
         return categoryMapper.toDto(category);
+    }
+
+    @Override
+    @Transactional
+    public void softDeleteCategoryById(Long categoryNo) {
+        Category category = categoryRepository.findById(categoryNo)
+                .orElseThrow(() -> new NoSuchElementException("제품분류가 존재하지 않습니다 :" + categoryNo));
+
+        category.softDelete();
     }
 }

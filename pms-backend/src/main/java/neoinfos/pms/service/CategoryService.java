@@ -25,4 +25,6 @@ public interface CategoryService {
     CategoryResponse findCategoryById(Long categoryNo);
 
     CategoryResponse updateCategoryById(Long categoryNo, CategoryUpdateRequest updateRequest);
+
+    void softDeleteCategoryById(Long categoryNo);
 }

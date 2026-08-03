@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -29,6 +30,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SQLRestriction("deleted_yn = 'N'")
 @Table(name = "category")
 public class Category {
 
@@ -65,7 +67,7 @@ public class Category {
             name = "deleted_yn",
             insertable = false
     )
-    private String deleteYn;
+    private String deletedYn;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -74,5 +76,10 @@ public class Category {
         this.categoryCode = categoryCode;
         this.categoryName = categoryName;
         this.used = used;
+    }
+
+    public void softDelete() {
+        this.deletedYn = "Y";
+        this.deletedAt = LocalDateTime.now();
     }
 }

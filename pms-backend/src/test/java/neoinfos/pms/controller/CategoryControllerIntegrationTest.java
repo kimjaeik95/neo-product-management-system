@@ -1,5 +1,6 @@
 package neoinfos.pms.controller;
 
+import jakarta.persistence.EntityManager;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.entity.Category;
@@ -40,6 +41,9 @@ public class CategoryControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -153,6 +157,50 @@ public class CategoryControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    // 제품 분류 삭제
+
+    @Test
+    @DisplayName("삭제 요청 시 204를 반환하고 실제 DB에 소프트 딜리트가 반영된다")
+    void deleteCategoryById_success() throws Exception {
+        // given
+        Category saved = categoryRepository.save(
+                Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build());
+
+        // when & then
+        mockMvc.perform(delete("/api/categories/{categoryNo}", saved.getCategoryNo()))
+                .andExpect(status().isNoContent());
+
+        // @SQLRestriction 때문에 기본 findById로는 조회 안 됨  (네이티브 쿼리로 직접 검증)
+        Object deletedYn =  em.createNativeQuery(
+                        """
+                        SELECT deleted_yn
+                        FROM category
+                        WHERE category_no = :no
+                        """
+                )
+                .setParameter("no", saved.getCategoryNo())
+                .getSingleResult();
+
+        assertThat(deletedYn.toString()).isEqualTo("Y");
+    }
+
+    @Test
+    @DisplayName("삭제 후에는 목록 조회에서 제외된다")
+    void deleteCategoryById_excludedFromList() throws Exception {
+        // given
+        Category saved = categoryRepository.save(
+                Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build());
+
+        // when
+        mockMvc.perform(delete("/api/categories/{categoryNo}", saved.getCategoryNo()))
+                .andExpect(status().isNoContent());
+
+        // then
+        mockMvc.perform(get("/api/categories"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.categoryCode == 'CATE001')]").doesNotExist());
     }
 }
 

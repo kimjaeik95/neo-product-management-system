@@ -237,5 +237,36 @@ class CategoryServiceImplTest {
         // then: 코드가 안 바뀌었으니 existsByCategoryCode가 호출되지 않아야 함
         verify(categoryRepository, never()).existsByCategoryCode(any());
     }
+
+    // 제품분류 삭제
+    @Test
+    @DisplayName("정상적으로 소프트 딜리트 처리된다")
+    void softDeleteCategoryById_success() {
+        // given
+        Long categoryNo = 1L;
+        Category category = Category.builder()
+                .categoryNo(categoryNo).categoryCode("CATE001").categoryName("의류").used("Y").build();
+
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.of(category));
+
+        // when
+        categoryService.softDeleteCategoryById(categoryNo);
+
+        // then
+        assertThat(category.getDeletedYn()).isEqualTo("Y");
+        assertThat(category.getDeletedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 categoryNo면 예외를 던진다")
+    void softDeleteCategoryById_notFound() {
+        // given
+        Long categoryNo = 999L;
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> categoryService.softDeleteCategoryById(categoryNo))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
 

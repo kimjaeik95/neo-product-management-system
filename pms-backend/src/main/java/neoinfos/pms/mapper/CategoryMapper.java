@@ -1,6 +1,5 @@
 package neoinfos.pms.mapper;
 
-import lombok.AllArgsConstructor;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
 import neoinfos.pms.entity.Category;

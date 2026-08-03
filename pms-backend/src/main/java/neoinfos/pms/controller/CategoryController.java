@@ -5,11 +5,15 @@ import lombok.RequiredArgsConstructor;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
 import neoinfos.pms.service.CategoryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * packageName    : neoinfos.pms.controller
@@ -28,9 +32,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @PostMapping("/category")
+    @PostMapping("/categories")
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         CategoryResponse category = categoryService.createCategory(categoryRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryResponse>> getCategories() {
+        List<CategoryResponse> category = categoryService.findAllCategory();
         return ResponseEntity.ok().body(category);
     }
 }

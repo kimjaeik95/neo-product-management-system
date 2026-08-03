@@ -13,12 +13,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -106,5 +106,27 @@ class CategoryServiceImplTest {
         assertThat(result.getCategoryCode()).isEqualTo("CATE001");
         assertThat(result.getCategoryNo()).isEqualTo(1L);
         verify(categoryRepository).save(category);
+    }
+
+    @Test
+    @DisplayName("카테고리 목록을 반환한다")
+    void findAllCategory_success() {
+        // given
+        Category category1 = Category.builder().categoryCode("CATE001").categoryName("의류").build();
+        Category category2 = Category.builder().categoryCode("CATE002").categoryName("잡화").build();
+
+        CategoryResponse response1 = CategoryResponse.builder().categoryCode("CATE001").categoryName("의류").build();
+        CategoryResponse response2 = CategoryResponse.builder().categoryCode("CATE002").categoryName("잡화").build();
+
+        given(categoryRepository.findAll()).willReturn(List.of(category1, category2));
+        given(categoryMapper.toDto(category1)).willReturn(response1);
+        given(categoryMapper.toDto(category2)).willReturn(response2);
+
+        // when
+        List<CategoryResponse> result = categoryService.findAllCategory();
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting("categoryCode").containsExactly("CATE001", "CATE002");
     }
 }

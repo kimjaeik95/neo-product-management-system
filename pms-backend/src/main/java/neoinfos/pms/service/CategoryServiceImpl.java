@@ -9,6 +9,9 @@ import neoinfos.pms.mapper.CategoryMapper;
 import neoinfos.pms.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * packageName    : neoinfos.pms.service
  * fileName       : ProductMasterService
@@ -37,5 +40,14 @@ public class CategoryServiceImpl implements CategoryService {
         Category saveCategory = categoryRepository.save(category);
 
         return categoryMapper.toDto(saveCategory);
+    }
+
+    @Override
+    public List<CategoryResponse> findAllCategory() {
+        List<Category> categories = categoryRepository.findAll();
+
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

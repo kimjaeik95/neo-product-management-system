@@ -1,6 +1,7 @@
 package neoinfos.pms.controller;
 
 import neoinfos.pms.dto.CategoryRequest;
+import neoinfos.pms.entity.Category;
 import neoinfos.pms.repository.CategoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
+
+import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,7 +53,7 @@ public class CategoryControllerIntegrationTest {
                 .build();
 
         // when & then
-        mockMvc.perform(post("/api/category")
+        mockMvc.perform(post("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -69,15 +72,30 @@ public class CategoryControllerIntegrationTest {
                 {
                     "categoryCode" : "",
                     "categoryName": "의류"
-             
+                             
                 }
                 """;
 
         // when & then
-        mockMvc.perform(post("/api/category")
+        mockMvc.perform(post("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("저장된 제품분류 목록을 조회한다")
+    void getCategories_success() throws Exception {
+        // given
+        categoryRepository.save(Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build());
+        categoryRepository.save(Category.builder().categoryCode("CATE002").categoryName("잡화").used("Y").build());
+
+        // when & then
+        mockMvc.perform(get("/api/categories"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].categoryCode")
+                        .value(hasItems("CATE001", "CATE002")));
+    }
 }
+
 

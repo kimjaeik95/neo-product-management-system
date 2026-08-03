@@ -3,6 +3,8 @@ package neoinfos.pms.service;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
 
+import java.util.List;
+
 /**
  * packageName    : neoinfos.pms.service
  * fileName       : ProductMasterServcie
@@ -16,4 +18,6 @@ import neoinfos.pms.dto.CategoryResponse;
  */
 public interface CategoryService {
     CategoryResponse createCategory(CategoryRequest categoryRequest);
+
+    List<CategoryResponse> findAllCategory();
 }

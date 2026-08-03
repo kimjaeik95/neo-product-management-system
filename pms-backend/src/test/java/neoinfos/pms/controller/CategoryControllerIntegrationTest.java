@@ -1,4 +1,4 @@
-package neoinfos.pms.service;
+package neoinfos.pms.controller;
 
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.repository.CategoryRepository;
@@ -8,13 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.springframework.test.web.servlet.MockMvc;
-
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
 /**
  * packageName    : neoinfos.pms.service
@@ -42,7 +41,7 @@ public class CategoryControllerIntegrationTest {
     private CategoryRepository categoryRepository;
 
     @Test
-    @DisplayName("카테고리 생성 성공 - 201/200 응답과 DB 저장 확인")
+    @DisplayName("카테고리 생성 성공 - 200 응답과 DB 저장 확인")
     void createCategory_success() throws Exception {
         // given
         CategoryRequest request = CategoryRequest.builder()
@@ -62,4 +61,23 @@ public class CategoryControllerIntegrationTest {
         assertThat(categoryRepository.existsByCategoryCode("CATE001")).isTrue();
     }
 
+    @Test
+    @DisplayName("필수값 누락 시 밸리데이션 오류로 400을 반환한다")
+    void createCategory_validationFail() throws Exception {
+        // given: categoryCode 없이 요청
+        String invalidJson = """
+                {
+                    "categoryCode" : "",
+                    "categoryName": "의류"
+             
+                }
+                """;
+
+        // when & then
+        mockMvc.perform(post("/api/category")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+    }
 }
+

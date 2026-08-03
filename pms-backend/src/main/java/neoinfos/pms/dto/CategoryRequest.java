@@ -1,5 +1,21 @@
-package neoinfos.pms.dto;/**
- *packageName    : neoinfos.pms.dto
+package neoinfos.pms.dto;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+/**
+ * packageName    : neoinfos.pms.dto
  * fileName       : CategoryRequest
  * author         : JAEIK
  * date           : 8/3/26
@@ -8,5 +24,19 @@ package neoinfos.pms.dto;/**
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 8/3/26        JAEIK       최초 생성
- */public class CategoryRequest {
+ */
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CategoryRequest {
+    @NotBlank
+    @Size(max = 100)
+    private String categoryCode;
+
+    @NotBlank
+    @Size(max = 100)
+    private String categoryName;
+
 }
+

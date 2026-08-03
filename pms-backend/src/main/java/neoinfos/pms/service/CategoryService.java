@@ -2,8 +2,6 @@ package neoinfos.pms.service;
 
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
-import neoinfos.pms.dto.ProductMasterRequest;
-import neoinfos.pms.entity.Category;
 
 /**
  * packageName    : neoinfos.pms.service
@@ -16,6 +14,6 @@ import neoinfos.pms.entity.Category;
  * -----------------------------------------------------------
  * 8/3/26        JAEIK       최초 생성
  */
-public interface ProductMasterService {
-    CategoryResponse createProduct(CategoryRequest categoryRequest);
+public interface CategoryService {
+    CategoryResponse createCategory(CategoryRequest categoryRequest);
 }

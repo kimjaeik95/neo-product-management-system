@@ -4,12 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
+import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,5 +51,11 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long categoryNo) {
         CategoryResponse category = categoryService.findCategoryById(categoryNo);
         return ResponseEntity.ok().body(category);
+    }
+
+    @PutMapping("/categories/{categoryNo}")
+    public ResponseEntity<CategoryResponse> updateCategoryById(@PathVariable Long categoryNo,@Valid @RequestBody CategoryUpdateRequest updateRequest) {
+        CategoryResponse categoryResponse = categoryService.updateCategoryById(categoryNo, updateRequest);
+        return ResponseEntity.ok().body(categoryResponse);
     }
 }

@@ -56,4 +56,10 @@ public class Category {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public void updateCategory(String categoryCode, String categoryName, String used) {
+        this.categoryCode = categoryCode;
+        this.categoryName = categoryName;
+        this.used = used;
+    }
 }

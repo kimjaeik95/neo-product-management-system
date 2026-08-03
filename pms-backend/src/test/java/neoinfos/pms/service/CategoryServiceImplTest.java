@@ -3,6 +3,7 @@ package neoinfos.pms.service;
 import com.sun.jdi.request.DuplicateRequestException;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
+import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.mapper.CategoryMapper;
 import neoinfos.pms.repository.CategoryRepository;
@@ -45,6 +46,8 @@ class CategoryServiceImplTest {
 
     @InjectMocks
     private CategoryServiceImpl categoryService;
+
+    // category 생성
 
     @Test
     @DisplayName("중복된 제품분류코드면 중복 오류발생")
@@ -110,6 +113,8 @@ class CategoryServiceImplTest {
         verify(categoryRepository).save(category);
     }
 
+    // category 전체 조회
+
     @Test
     @DisplayName("제품분류 목록을 반환한다")
     void findAllCategory_success() {
@@ -131,6 +136,8 @@ class CategoryServiceImplTest {
         assertThat(result).hasSize(2);
         assertThat(result).extracting("categoryCode").containsExactly("CATE001", "CATE002");
     }
+
+    // category 단건 조회
 
     @Test
     @DisplayName("categoryNo로 제품분류 단건 조회하여 반환한다")
@@ -165,4 +172,70 @@ class CategoryServiceImplTest {
 
         verify(categoryMapper, never()).toDto(any());
     }
+
+    // Update Category
+
+    @Test
+    @DisplayName("정상적으로 카테고리를 수정한다")
+    void updateCategoryById_success() {
+        // given
+        Long categoryNo = 1L;
+        Category category = Category.builder()
+                .categoryNo(categoryNo).categoryCode("CATE001").categoryName("의류").used("Y").build();
+
+        CategoryUpdateRequest updateRequest = new CategoryUpdateRequest("CATE002", "잡화", "N");
+
+        CategoryResponse response = CategoryResponse.builder()
+                .categoryNo(categoryNo).categoryCode("CATE002").categoryName("잡화").used("N").build();
+
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.of(category));
+        given(categoryRepository.existsByCategoryCode("CATE002")).willReturn(false);
+        given(categoryMapper.toDto(category)).willReturn(response);
+
+        // when
+        CategoryResponse result = categoryService.updateCategoryById(categoryNo, updateRequest);
+
+        // then
+        assertThat(result.getCategoryCode()).isEqualTo("CATE002");
+        assertThat(result.getUsed()).isEqualTo("N");
+    }
+
+    @Test
+    @DisplayName("다른 카테고리가 이미 쓰고 있는 코드로 변경하면 예외를 던진다")
+    void updateCategoryById_duplicateCode() {
+        // given
+        Long categoryNo = 1L;
+        Category category = Category.builder()
+                .categoryNo(categoryNo).categoryCode("CATE001").categoryName("의류").used("Y").build();
+
+        CategoryUpdateRequest updateRequest = new CategoryUpdateRequest("CATE999", "의류", "Y");
+
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.of(category));
+        given(categoryRepository.existsByCategoryCode("CATE999")).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> categoryService.updateCategoryById(categoryNo, updateRequest))
+                .isInstanceOf(DuplicateRequestException.class);
+    }
+
+    @Test
+    @DisplayName("자기 자신의 코드로 수정 요청하면 중복 체크를 통과한다")
+    void updateCategoryById_sameCodeNoDuplicateCheck() {
+        // given
+        Long categoryNo = 1L;
+        Category category = Category.builder()
+                .categoryNo(categoryNo).categoryCode("CATE001").categoryName("의류").used("Y").build();
+
+        CategoryUpdateRequest updateRequest = new CategoryUpdateRequest("CATE001", "잡화", "N");
+
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.of(category));
+        given(categoryMapper.toDto(category)).willReturn(CategoryResponse.builder().categoryCode("CATE001").build());
+
+        // when
+        categoryService.updateCategoryById(categoryNo, updateRequest);
+
+        // then: 코드가 안 바뀌었으니 existsByCategoryCode가 호출되지 않아야 함
+        verify(categoryRepository, never()).existsByCategoryCode(any());
+    }
 }
+

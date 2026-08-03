@@ -2,6 +2,7 @@ package neoinfos.pms.service;
 
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
+import neoinfos.pms.dto.CategoryUpdateRequest;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface CategoryService {
     List<CategoryResponse> findAllCategory();
 
     CategoryResponse findCategoryById(Long categoryNo);
+
+    CategoryResponse updateCategoryById(Long categoryNo, CategoryUpdateRequest updateRequest);
 }

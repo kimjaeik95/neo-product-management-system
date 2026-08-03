@@ -1,6 +1,7 @@
 package neoinfos.pms.controller;
 
 import neoinfos.pms.dto.CategoryRequest;
+import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.repository.CategoryRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +44,7 @@ public class CategoryControllerIntegrationTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    // category 생성
     @Test
     @DisplayName("카테고리 생성 성공 - 200 응답과 DB 저장 확인")
     void createCategory_success() throws Exception {
@@ -83,6 +85,7 @@ public class CategoryControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    // category 전체조회
     @Test
     @DisplayName("저장된 제품분류 목록을 조회한다")
     void getCategories_success() throws Exception {
@@ -97,6 +100,7 @@ public class CategoryControllerIntegrationTest {
                         .value(hasItems("CATE001", "CATE002")));
     }
 
+    // category 단건 조회
     @Test
     @DisplayName("존재하는 categoryNo로 조회하면 정상 응답을 반환한다")
     void getCategoryById_success() throws Exception {
@@ -109,6 +113,48 @@ public class CategoryControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.categoryCode").value("CATE001"));
     }
+
+    // Update Category
+    @Test
+    @DisplayName("정상적으로 카테고리를 수정한다")
+    void updateCategoryById_success() throws Exception {
+        // given
+        Category saved = categoryRepository.save(
+                Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build());
+
+        CategoryUpdateRequest request = new CategoryUpdateRequest("CATE002", "잡화", "N");
+
+        // when & then
+        mockMvc.perform(put("/api/categories/{categoryNo}", saved.getCategoryNo())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categoryCode").value("CATE002"))
+                .andExpect(jsonPath("$.used").value("N"));
+    }
+
+    @Test
+    @DisplayName("used 값이 Y/N이 아니면 400 밸리데이션 오류를 반환한다")
+    void updateCategoryById_invalidUsedValue() throws Exception {
+        // given
+        Category saved = categoryRepository.save(
+                Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build());
+
+        String invalidJson = """
+                {
+                    "categoryCode": "CATE001",
+                    "categoryName": "의류",
+                    "used": "X"
+                }
+                """;
+
+        // when & then
+        mockMvc.perform(put("/api/categories/{categoryNo}", saved.getCategoryNo())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+    }
 }
+
 
 

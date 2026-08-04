@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.springframework.test.web.servlet.MockMvc;
@@ -159,6 +160,32 @@ public class CategoryControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("존재하지 않는 categoryNo로 수정하면 오류를 반환한다")
+    void updateCategoryById_notFound() throws Exception {
+        CategoryUpdateRequest request = new CategoryUpdateRequest("CATE001", "의류", "Y");
+
+        mockMvc.perform(put("/api/categories/{categoryNo}", 9999L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 코드로 변경하면 오류를 반환한다")
+    void updateCategoryById_duplicateCode() throws Exception {
+        categoryRepository.save(Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build());
+        Category target = categoryRepository.save(
+                Category.builder().categoryCode("CATE002").categoryName("잡화").used("Y").build());
+
+        CategoryUpdateRequest request = new CategoryUpdateRequest("CATE001", "잡화", "Y");
+
+        mockMvc.perform(put("/api/categories/{categoryNo}", target.getCategoryNo())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is4xxClientError());
+    }
+
     // 제품 분류 삭제
 
     @Test
@@ -201,6 +228,13 @@ public class CategoryControllerIntegrationTest {
         mockMvc.perform(get("/api/categories"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.categoryCode == 'CATE001')]").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 categoryNo 삭제 시 오류를 반환한다")
+    void deleteCategoryById_notFound() throws Exception {
+        mockMvc.perform(delete("/api/categories/{categoryNo}", 9999L))
+                .andExpect(status().is4xxClientError());
     }
 }
 

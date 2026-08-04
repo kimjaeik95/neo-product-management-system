@@ -26,16 +26,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class ProductMasterResponse {
+
     private Long productNo;
+
     private Long categoryNo;
+
     private String productCode;
+
     private String productName;
+
     private LocalDate productCreated;
+
     private BigDecimal price;
+
     private String used;
+
     private String address;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
+
     private String deletedYn;
+
     private LocalDateTime deletedAt;
 }

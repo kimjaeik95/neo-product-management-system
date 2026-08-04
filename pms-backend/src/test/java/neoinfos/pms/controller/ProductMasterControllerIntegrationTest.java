@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,6 +45,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 public class ProductMasterControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -123,5 +126,75 @@ public class ProductMasterControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
+    }
+
+    // ProductMaster 전체조회
+    @Test
+    @DisplayName("상품이 등록되어 있으면 목록 조회 시 200과 페이징 데이터를 반환한다")
+    void getProductMasters_success() throws Exception {
+
+        // given
+        Category category = categoryRepository.save(
+                Category.builder()
+                        .categoryCode("TEST100")
+                        .categoryName("전자기기")
+                        .used("Y")
+                        .build()
+        );
+
+        productMasterRepository.save(
+                ProductMaster.builder()
+                        .category(category)
+                        .productCode("P001")
+                        .productName("노트북")
+                        .productCreated(LocalDate.of(2026, 8, 1))
+                        .price(new BigDecimal("1000000"))
+                        .used("Y")
+                        .address("서울")
+                        .build()
+        );
+
+        productMasterRepository.save(
+                ProductMaster.builder()
+                        .category(category)
+                        .productCode("P002")
+                        .productName("마우스")
+                        .productCreated(LocalDate.of(2026, 8, 2))
+                        .price(new BigDecimal("50000"))
+                        .used("Y")
+                        .address("경기")
+                        .build()
+        );
+
+
+        // when & then
+        mockMvc.perform(get("/api/product-masters")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+
+                // content 개수
+                .andExpect(jsonPath("$.content.length()").value(2))
+
+                // 데이터 확인
+                .andExpect(jsonPath("$.content[0].productCode")
+                        .value("P001"))
+                .andExpect(jsonPath("$.content[0].productName")
+                        .value("노트북"))
+
+                .andExpect(jsonPath("$.content[1].productCode")
+                        .value("P002"))
+                .andExpect(jsonPath("$.content[1].productName")
+                        .value("마우스"))
+
+                // 페이징 정보 확인
+                .andExpect(jsonPath("$.totalElements")
+                        .value(2))
+                .andExpect(jsonPath("$.totalPages")
+                        .value(1))
+                .andExpect(jsonPath("$.number")
+                        .value(0))
+                .andExpect(jsonPath("$.size")
+                        .value(10));
     }
 }

@@ -1,6 +1,9 @@
 package neoinfos.pms.repository;
 
+import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.entity.ProductMaster;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

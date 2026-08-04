@@ -40,6 +40,7 @@ public class ProductMasterMapper {
                 .productName(productMaster.getProductName())
                 .productCreated(productMaster.getProductCreated())
                 .price(productMaster.getPrice())
+                .used(productMaster.getUsed())
                 .address(productMaster.getAddress())
                 .createdAt(productMaster.getCreatedAt())
                 .updatedAt(productMaster.getUpdatedAt())

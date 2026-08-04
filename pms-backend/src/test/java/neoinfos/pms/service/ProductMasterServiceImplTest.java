@@ -17,7 +17,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -105,5 +112,71 @@ class ProductMasterServiceImplTest {
                 .isInstanceOf(CategoryNotFoundException.class);
 
         verify(productMasterRepository, never()).save(any());
+    }
+
+    // ProductMaster 전체조회
+    @DisplayName("등록된 상품이 있으면 페이징된 전체 목록을 반환한다")
+    @Test
+    void findAllProductMaster_success() {
+        // given
+        Category category = Category.builder()
+                .categoryNo(1L)
+                .categoryCode("CAFE001")
+                .categoryName("전자기기")
+                .build();
+
+        ProductMaster product1 = ProductMaster.builder()
+                .category(category)
+                .productCode("P001")
+                .productName("노트북")
+                .productCreated(LocalDate.of(2026, 8, 1))
+                .price(new BigDecimal("1000000"))
+                .address("서울")
+                .build();
+
+        ProductMaster product2 = ProductMaster.builder()
+                .category(category)
+                .productCode("P002")
+                .productName("마우스")
+                .productCreated(LocalDate.of(2026, 8, 2))
+                .price(new BigDecimal("50000"))
+                .address("경기")
+                .build();
+
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<ProductMaster> productPage = new PageImpl<>(
+                List.of(product1, product2),
+                pageable,
+                2
+        );
+
+
+        ProductMasterResponse response1 = ProductMasterResponse.builder()
+                .productCode("P001")
+                .productName("노트북")
+                .build();
+
+        ProductMasterResponse response2 = ProductMasterResponse.builder()
+                .productCode("P002")
+                .productName("마우스")
+                .build();
+
+
+        given(productMasterRepository.findAll(pageable)).willReturn(productPage);
+        given(productMasterMapper.toDto(product1)).willReturn(response1);
+        given(productMasterMapper.toDto(product2)).willReturn(response2);
+
+
+        // when
+        Page<ProductMasterResponse> result = productMasterService.findALLProductMasters(pageable);
+
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getNumber()).isEqualTo(0);
+        assertThat(result.getSize()).isEqualTo(10);
+        verify(productMasterRepository).findAll(pageable);
     }
 }

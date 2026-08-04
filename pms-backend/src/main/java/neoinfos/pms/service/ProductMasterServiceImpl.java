@@ -12,8 +12,13 @@ import neoinfos.pms.mapper.ProductMasterMapper;
 import neoinfos.pms.repository.CategoryRepository;
 import neoinfos.pms.repository.ProductMasterRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *packageName    : neoinfos.pms.service
@@ -53,5 +58,12 @@ public class ProductMasterServiceImpl implements ProductMasterService{
         }
 
         return productMasterMapper.toDto(savedProductMaster);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductMasterResponse> findALLProductMasters(Pageable pageable) {
+        return productMasterRepository.findAll(pageable)
+                .map(productMasterMapper::toDto);
     }
 }

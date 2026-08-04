@@ -1,0 +1,13 @@
+pms :
+  cors:
+    allow-credentials: true
+    allowed-headers:
+      - "*"
+    allowed-origins:
+      - http://localhost:5173
+      - https://localhost:5173
+    allowed-methods:
+      - "*"
+    expose-headers:
+      - "*"
+    max-age: 3600

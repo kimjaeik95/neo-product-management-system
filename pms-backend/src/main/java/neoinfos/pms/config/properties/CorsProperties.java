@@ -1,5 +1,10 @@
-package neoinfos.pms.config.properties;/**
- *packageName    : neoinfos.pms.config.properties
+package neoinfos.pms.config.properties;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
+
+/**
+ * packageName    : neoinfos.pms.config.properties
  * fileName       : CorsProperties
  * author         : JAEIK
  * date           : 8/4/26
@@ -8,5 +13,14 @@ package neoinfos.pms.config.properties;/**
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 8/4/26        JAEIK       최초 생성
- */public record CorsProperties() {
+ */
+@ConfigurationProperties("pms.cors")
+public record CorsProperties(
+        Boolean allowCredentials,
+        String[] allowedHeaders,
+        String[] allowedOrigins,
+        String[] allowedMethods,
+        String[] exposeHeaders,
+        Long maxAge
+) {
 }

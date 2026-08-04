@@ -1,7 +1,8 @@
 package neoinfos.pms.service;
 
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
+import neoinfos.pms.common.exception.category.CategoryNotFoundException;
+import neoinfos.pms.common.exception.category.DuplicateCategoryCodeException;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
 import neoinfos.pms.dto.CategoryUpdateRequest;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         if (categoryRepository.existsByCategoryCode(categoryRequest.getCategoryCode())) {
-            throw new DuplicateRequestException("중복된 제품분류 코드입니다.");
+            throw new DuplicateCategoryCodeException();
         }
 
         Category category = categoryMapper.toEntity(categoryRequest);
@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public CategoryResponse findCategoryById(Long categoryNo) {
         Category category = categoryRepository.findById(categoryNo)
-                .orElseThrow(() -> new NoSuchElementException("제품분류가 존재하지 않습니다 :" + categoryNo));
+                .orElseThrow(() -> new CategoryNotFoundException(categoryNo));
 
         return categoryMapper.toDto(category);
 
@@ -70,11 +70,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse updateCategoryById(Long categoryNo, CategoryUpdateRequest updateRequest) {
         Category category = categoryRepository.findById(categoryNo)
-                .orElseThrow(() -> new NoSuchElementException("제품분류가 존재하지 않습니다 :" + categoryNo));
+                .orElseThrow(() -> new CategoryNotFoundException(categoryNo));
 
         if (!category.getCategoryCode().equals(updateRequest.getCategoryCode())
                 && categoryRepository.existsByCategoryCode(updateRequest.getCategoryCode())) {
-            throw new DuplicateRequestException("중복된 제품분류 코드입니다.");
+            throw new DuplicateCategoryCodeException();
         }
 
         category.updateCategory(
@@ -91,7 +91,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void softDeleteCategoryById(Long categoryNo) {
         Category category = categoryRepository.findById(categoryNo)
-                .orElseThrow(() -> new NoSuchElementException("제품분류가 존재하지 않습니다 :" + categoryNo));
+                .orElseThrow(() -> new CategoryNotFoundException(categoryNo));
 
         category.softDelete();
     }

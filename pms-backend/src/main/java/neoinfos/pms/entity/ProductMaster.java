@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -52,7 +53,7 @@ public class ProductMaster {
     private String productName;
 
     @Column(name = "product_created")
-    private LocalDateTime productCreated;
+    private LocalDate productCreated;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -63,9 +64,27 @@ public class ProductMaster {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "created_at")
+    @Column(
+            name = "created_at",
+            insertable = false,
+            updatable = false
+    )
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(
+            name = "updated_at",
+            insertable = false,
+            updatable = false
+    )
     private LocalDateTime updatedAt;
+
+    @Column(
+            name = "deleted_yn",
+            insertable = false
+    )
+    private String deletedYn;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
 }

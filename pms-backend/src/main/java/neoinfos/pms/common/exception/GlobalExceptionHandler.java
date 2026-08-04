@@ -3,6 +3,7 @@ package neoinfos.pms.common.exception;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import neoinfos.pms.common.exception.reponse.ErrorResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,7 +34,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
 
-    // Url 경로 잘못 입력시 예외
+    // 존재하지 않는 Api URI 경로일때 예외
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleNoResourceFoundException(Exception e) {
+        log.warn("NoResourceFoundException: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(ErrorCode.HANDLE_ACCESS_DENIED); // 혹은 적절한 ErrorCode
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // Url 경로 타입 불일치 입력시 예외
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());

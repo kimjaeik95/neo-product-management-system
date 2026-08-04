@@ -4,42 +4,38 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import neoinfos.pms.entity.Category;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * packageName    : neoinfos.pms.dto
- * fileName       : CategoryResponse
+ * fileName       : ProductMasterResponse
  * author         : JAEIK
- * date           : 8/3/26
+ * date           : 8/4/26
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 8/3/26        JAEIK       최초 생성
+ * 8/4/26        JAEIK       최초 생성
  */
 @Getter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponse {
-
+@NoArgsConstructor
+@Builder
+public class ProductMasterResponse {
+    private Long productNo;
     private Long categoryNo;
-
-    private String categoryCode;
-
-    private String categoryName;
-
+    private String productCode;
+    private String productName;
+    private LocalDate productCreated;
+    private BigDecimal price;
     private String used;
-
+    private String address;
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
-
     private String deletedYn;
-
     private LocalDateTime deletedAt;
 }
-
-
-

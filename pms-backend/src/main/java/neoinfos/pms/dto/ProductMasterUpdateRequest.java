@@ -2,38 +2,32 @@ package neoinfos.pms.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import neoinfos.pms.entity.Category;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * packageName    : neoinfos.pms.service
- * fileName       : ProductMasterRequest
+ * packageName    : neoinfos.pms.dto
+ * fileName       : ProductMasterUpdateRequest
  * author         : JAEIK
- * date           : 8/3/26
+ * date           : 8/4/26
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 8/3/26        JAEIK       최초 생성
+ * 8/4/26        JAEIK       최초 생성
  */
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@AllArgsConstructor
-public class ProductMasterRequest {
-
-    @NotNull
-    private Long categoryNo;
+public class ProductMasterUpdateRequest {
 
     @NotBlank
     @Size(max = 100)
@@ -43,7 +37,11 @@ public class ProductMasterRequest {
     @Size(max = 100)
     private String productName;
 
-    private LocalDate productCreated;
+    @NotBlank
+    @Pattern(regexp = "[YN]")
+    private String used;
+
+    private LocalDateTime productCreated;
 
     @DecimalMin(value = "0")
     private BigDecimal price;

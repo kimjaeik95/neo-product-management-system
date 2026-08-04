@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryRequest {
+
     @NotBlank
     @Size(max = 100)
     private String categoryCode;

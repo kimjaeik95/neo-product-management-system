@@ -19,6 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 /**
  *packageName    : neoinfos.pms.service
@@ -101,5 +104,18 @@ public class ProductMasterServiceImpl implements ProductMasterService{
                 .orElseThrow(() -> new ProductMasterNotFoundException(productNo));
 
         productMaster.softDelete();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductMasterResponse> findByProductMastersByCategoryNo(Long categoryNo) {
+        categoryRepository.findById(categoryNo)
+                .orElseThrow(() -> new CategoryNotFoundException(categoryNo));
+
+        List<ProductMaster> productMasters = productMasterRepository.findByCategoryIdWithCategory(categoryNo);
+
+        return productMasters.stream()
+                .map(productMasterMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

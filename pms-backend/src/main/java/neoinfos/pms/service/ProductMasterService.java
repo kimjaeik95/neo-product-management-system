@@ -7,6 +7,8 @@ import neoinfos.pms.dto.ProductMasterUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * packageName    : neoinfos.pms.service
  * fileName       : ProductMasterService
@@ -27,4 +29,6 @@ public interface ProductMasterService {
     ProductMasterResponse updateProductMasterById(Long productNo, ProductMasterUpdateRequest updateRequest);
 
     void softDeleteById(Long productNo);
+
+    List<ProductMasterResponse> findByProductMastersByCategoryNo(Long categoryNo);
 }

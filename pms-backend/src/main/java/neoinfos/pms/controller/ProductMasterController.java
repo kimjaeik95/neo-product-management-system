@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 
 /**
  * packageName    : neoinfos.pms.controller
@@ -66,5 +68,11 @@ public class ProductMasterController {
     public ResponseEntity<Void> deleteProductMasterById(@PathVariable("productNo") Long productNo) {
         productMasterService.softDeleteById(productNo);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/product-masters/category/{categoryNo}")
+    public ResponseEntity<List<ProductMasterResponse>> getProductMastersByCategoryNo(@PathVariable("categoryNo") Long categoryNo) {
+        List<ProductMasterResponse> productMastersResponse = productMasterService.findByProductMastersByCategoryNo(categoryNo);
+        return ResponseEntity.ok().body(productMastersResponse);
     }
 }

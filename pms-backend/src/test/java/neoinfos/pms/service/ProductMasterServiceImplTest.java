@@ -3,6 +3,7 @@ package neoinfos.pms.service;
 import com.sun.jdi.request.DuplicateRequestException;
 import neoinfos.pms.common.exception.category.CategoryNotFoundException;
 import neoinfos.pms.common.exception.productmaster.DuplicateProductMasterException;
+import neoinfos.pms.common.exception.productmaster.ProductMasterNotFoundException;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.entity.Category;
@@ -178,5 +179,64 @@ class ProductMasterServiceImplTest {
         assertThat(result.getNumber()).isEqualTo(0);
         assertThat(result.getSize()).isEqualTo(10);
         verify(productMasterRepository).findAll(pageable);
+    }
+
+    // ProductMaster 단건 조회
+    @Test
+    @DisplayName("존재하는 productNo로 조회하면 상품 정보를 반환한다")
+    void findProductMasterById_success() {
+        // given
+        Long productNo = 1L;
+
+        Category category = Category.builder()
+                .categoryNo(10L)
+                .categoryName("전자기기")
+                .build();
+
+        ProductMaster productMaster = ProductMaster.builder()
+                .productNo(productNo)
+                .category(category)
+                .productCode("P001")
+                .productName("키보드")
+                .productCreated(LocalDate.of(2026, 8, 1))
+                .price(new BigDecimal("100000"))
+                .address("서울")
+                .used("Y")
+                .build();
+
+        ProductMasterResponse expected = ProductMasterResponse.builder()
+                .productNo(productNo)
+                .productCode("P001")
+                .build();
+
+        given(productMasterRepository.findById(productNo))
+                .willReturn(Optional.of(productMaster));
+
+        given(productMasterMapper.toDto(productMaster))
+                .willReturn(expected);
+
+        // when
+        ProductMasterResponse result =
+                productMasterService.findProductMasterById(productNo);
+
+        // then
+        assertThat(result).isEqualTo(expected);
+
+        verify(productMasterRepository).findById(productNo);
+        verify(productMasterMapper).toDto(productMaster);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 productMasterNo로 조회하면 ProductMasterNotFoundException을 던진다")
+    void findProductMasterById_notFound() {
+        // given
+        Long productMasterNo = 999L;
+        given(productMasterRepository.findById(productMasterNo)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> productMasterService.findProductMasterById(productMasterNo))
+                .isInstanceOf(ProductMasterNotFoundException.class);
+
+        verify(productMasterMapper, never()).toDto(any());
     }
 }

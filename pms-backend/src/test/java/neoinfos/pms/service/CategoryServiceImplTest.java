@@ -1,6 +1,8 @@
 package neoinfos.pms.service;
 
 import com.sun.jdi.request.DuplicateRequestException;
+import neoinfos.pms.common.exception.category.CategoryNotFoundException;
+import neoinfos.pms.common.exception.category.DuplicateCategoryCodeException;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
 import neoinfos.pms.dto.CategoryUpdateRequest;
@@ -62,7 +64,7 @@ class CategoryServiceImplTest {
 
         // when & then
         assertThatThrownBy(() -> categoryService.createCategory(request))
-                .isInstanceOf(DuplicateRequestException.class)
+                .isInstanceOf(DuplicateCategoryCodeException.class)
                 .hasMessage("중복된 제품분류 코드입니다.");
 
         // 예외가 발생했을때 이 코드가 실행되지 않았는지??
@@ -167,8 +169,8 @@ class CategoryServiceImplTest {
 
         // when & then
         assertThatThrownBy(() -> categoryService.findCategoryById(categoryNo))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessage("제품분류가 존재하지 않습니다 :" + categoryNo);
+                .isInstanceOf(CategoryNotFoundException.class)
+                .hasMessage("제품분류가 존재하지 않습니다 : " + categoryNo);
 
         verify(categoryMapper, never()).toDto(any());
     }
@@ -215,7 +217,7 @@ class CategoryServiceImplTest {
 
         // when & then
         assertThatThrownBy(() -> categoryService.updateCategoryById(categoryNo, updateRequest))
-                .isInstanceOf(DuplicateRequestException.class);
+                .isInstanceOf(DuplicateCategoryCodeException.class);
     }
 
     @Test
@@ -266,7 +268,7 @@ class CategoryServiceImplTest {
 
         // when & then
         assertThatThrownBy(() -> categoryService.softDeleteCategoryById(categoryNo))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(CategoryNotFoundException.class);
     }
 }
 

@@ -1,6 +1,7 @@
 package neoinfos.pms.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -33,7 +34,7 @@ public class ProductMasterUpdateRequest {
     @Size(max = 100)
     private String productCode;
 
-    @NotBlank()
+    @NotBlank
     @Size(max = 100)
     private String productName;
 
@@ -44,6 +45,7 @@ public class ProductMasterUpdateRequest {
     private LocalDateTime productCreated;
 
     @DecimalMin(value = "0")
+    @Digits(integer = 10, fraction = 2)
     private BigDecimal price;
 
     private String address;

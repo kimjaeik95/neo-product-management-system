@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * packageName    : neoinfos.pms.repository
  * fileName       : ProductMasterRepository
@@ -21,4 +23,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductMasterRepository extends JpaRepository<ProductMaster, Long> {
     boolean existsByProductCode(String productCode);
+
+    Optional<ProductMaster> findById(Long productNo);
 }

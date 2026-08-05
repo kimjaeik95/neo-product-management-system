@@ -197,4 +197,36 @@ public class ProductMasterControllerIntegrationTest {
                 .andExpect(jsonPath("$.size")
                         .value(10));
     }
+
+    // ProductMaster 단건 조회
+    @Test
+    @DisplayName("존재하는 상품 번호로 조회하면 200과 상품 정보를 반환한다")
+    void getProductMaster_success() throws Exception {
+        // given
+        Category category = categoryRepository.save(Category.builder().categoryCode("P001").categoryName("전자기기").used("Y").build());
+        ProductMaster saved = productMasterRepository.save(
+                ProductMaster.builder()
+                        .category(category)
+                        .productCode("P001")
+                        .productName("무선 키보드")
+                        .productCreated(LocalDate.of(2026, 8, 1))
+                        .price(new BigDecimal("100000"))
+                        .address("서울")
+                        .used("Y")
+                        .build());
+
+        // when & then
+        mockMvc.perform(get("/api/product-masters/{productMasterNo}", saved.getProductNo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.productNo").value(saved.getProductNo()))
+                .andExpect(jsonPath("$.productCode").value("P001"))
+                .andExpect(jsonPath("$.productName").value("무선 키보드"));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 상품 번호로 조회하면 404를 반환한다")
+    void getProductMaster_notFound() throws Exception {
+        mockMvc.perform(get("/api/product-masters/{productMasterNo}", 999999L))
+                .andExpect(status().isNotFound());
+    }
 }

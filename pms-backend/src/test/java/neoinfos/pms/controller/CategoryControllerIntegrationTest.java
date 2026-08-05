@@ -64,7 +64,7 @@ public class CategoryControllerIntegrationTest {
         mockMvc.perform(post("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.categoryCode").value("CATE001"))
                 .andExpect(jsonPath("$.categoryName").value("의류"));
 

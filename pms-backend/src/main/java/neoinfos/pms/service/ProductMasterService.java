@@ -21,4 +21,6 @@ import java.util.List;
 public interface ProductMasterService {
     ProductMasterResponse createProductMaster(ProductMasterRequest productMasterRequest);
     Page<ProductMasterResponse> findALLProductMasters(Pageable pageable);
+
+    ProductMasterResponse findProductMasterById(Long productNo);
 }

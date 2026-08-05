@@ -49,19 +49,19 @@ public class CategoryController {
     }
 
     @GetMapping("/categories/{categoryNo}")
-    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long categoryNo) {
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable("categoryNo") Long categoryNo) {
         CategoryResponse category = categoryService.findCategoryById(categoryNo);
         return ResponseEntity.ok().body(category);
     }
 
     @PutMapping("/categories/{categoryNo}")
-    public ResponseEntity<CategoryResponse> updateCategoryById(@PathVariable Long categoryNo,@Valid @RequestBody CategoryUpdateRequest updateRequest) {
+    public ResponseEntity<CategoryResponse> updateCategoryById(@PathVariable("categoryNo") Long categoryNo,@Valid @RequestBody CategoryUpdateRequest updateRequest) {
         CategoryResponse categoryResponse = categoryService.updateCategoryById(categoryNo, updateRequest);
         return ResponseEntity.ok().body(categoryResponse);
     }
 
     @DeleteMapping("/categories/{categoryNo}")
-    public ResponseEntity<Void> deleteCategoryById(@PathVariable Long categoryNo) {
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable("categoryNo") Long categoryNo) {
         categoryService.softDeleteCategoryById(categoryNo);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

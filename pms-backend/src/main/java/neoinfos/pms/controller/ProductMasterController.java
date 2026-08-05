@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,5 +45,11 @@ public class ProductMasterController {
     public ResponseEntity<Page<ProductMasterResponse>> getProductMasters(@PageableDefault(size = 20) Pageable pageable) {
         Page<ProductMasterResponse> productMasters = productMasterService.findALLProductMasters(pageable);
         return ResponseEntity.ok().body(productMasters);
+    }
+
+    @GetMapping("/product-masters/{productNo}")
+    public ResponseEntity<ProductMasterResponse> getProductMaster(@PathVariable("productNo") Long productNo) {
+        ProductMasterResponse productMasterById = productMasterService.findProductMasterById(productNo);
+        return ResponseEntity.ok().body(productMasterById);
     }
 }

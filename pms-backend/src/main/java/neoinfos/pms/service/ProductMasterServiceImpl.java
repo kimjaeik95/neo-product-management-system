@@ -1,12 +1,12 @@
 package neoinfos.pms.service;
 
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import neoinfos.pms.common.exception.category.CategoryNotFoundException;
 import neoinfos.pms.common.exception.productmaster.DuplicateProductMasterException;
 import neoinfos.pms.common.exception.productmaster.ProductMasterNotFoundException;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
+import neoinfos.pms.dto.ProductMasterUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.entity.ProductMaster;
 import neoinfos.pms.mapper.ProductMasterMapper;
@@ -18,8 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *packageName    : neoinfos.pms.service
@@ -73,6 +71,25 @@ public class ProductMasterServiceImpl implements ProductMasterService{
     public ProductMasterResponse findProductMasterById(Long productNo) {
         ProductMaster productMaster = productMasterRepository.findById(productNo)
                 .orElseThrow(() -> new ProductMasterNotFoundException(productNo));
+
+        return productMasterMapper.toDto(productMaster);
+    }
+
+    @Override
+    @Transactional
+    public ProductMasterResponse updateProductMasterById(Long productNo, ProductMasterUpdateRequest updateRequest) {
+        ProductMaster productMaster = productMasterRepository.findById(productNo)
+                .orElseThrow(() -> new ProductMasterNotFoundException(productNo));
+
+        Category category = categoryRepository.findById(updateRequest.getCategoryNo())
+                .orElseThrow(() -> new CategoryNotFoundException(updateRequest.getCategoryNo()));
+
+        if (!productMaster.getProductCode().equals(updateRequest.getProductCode())
+                && productMasterRepository.existsByProductCode(updateRequest.getProductCode())) {
+            throw new DuplicateProductMasterException();
+        }
+
+        productMaster.updateProductMaster(updateRequest, category);
 
         return productMasterMapper.toDto(productMaster);
     }

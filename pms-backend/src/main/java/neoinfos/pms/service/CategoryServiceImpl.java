@@ -77,10 +77,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new DuplicateCategoryCodeException();
         }
 
-        category.updateCategory(
-                updateRequest.getCategoryCode(),
-                updateRequest.getCategoryName(),
-                updateRequest.getUsed());
+        category.updateCategory(updateRequest);
 
         categoryRepository.save(category);
 

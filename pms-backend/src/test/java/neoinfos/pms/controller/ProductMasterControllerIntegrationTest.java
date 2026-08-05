@@ -2,6 +2,7 @@ package neoinfos.pms.controller;
 
 
 import neoinfos.pms.dto.ProductMasterRequest;
+import neoinfos.pms.dto.ProductMasterUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.entity.ProductMaster;
 import neoinfos.pms.repository.CategoryRepository;
@@ -59,10 +60,22 @@ public class ProductMasterControllerIntegrationTest {
     // ProductMaster 생성
     private Long categoryNo;
 
+    private ProductMaster savedProduct;
+    private Category savedCategory;
     @BeforeEach
     void setUp() {
-        Category category = categoryRepository.saveAndFlush(Category.builder().categoryCode("TEST001").categoryName("전자기기").used("Y").build());
-        categoryNo = category.getCategoryNo();
+        savedCategory = categoryRepository.save(Category.builder().categoryCode("TEST-001").categoryName("전자제품").used("Y").build());
+        savedProduct = productMasterRepository.save(
+                ProductMaster.builder()
+                        .productCode("P-0001")
+                        .productName("기존상품")
+                        .category(savedCategory)
+                        .price(BigDecimal.valueOf(5000))
+                        .used("Y")
+                        .address("서울")
+                        .productCreated(LocalDate.now())
+                        .build()
+        );
     }
 
     @Test
@@ -228,5 +241,106 @@ public class ProductMasterControllerIntegrationTest {
     void getProductMaster_notFound() throws Exception {
         mockMvc.perform(get("/api/product-masters/{productMasterNo}", 999999L))
                 .andExpect(status().isNotFound());
+    }
+
+    // ProductMaster 업데이트
+
+    @Test
+    @DisplayName("PUT /product-masters/{productNo} - 정상 수정 시 200과 변경된 값을 반환한다")
+    void updateProductMaster_success() throws Exception {
+        ProductMasterUpdateRequest request = ProductMasterUpdateRequest.builder()
+                .categoryNo(savedCategory.getCategoryNo())
+                .productCode("P-9999")
+                .productName("수정된상품")
+                .productCreated(LocalDate.now())
+                .price(BigDecimal.valueOf(9999))
+                .used("N")
+                .address("부산")
+                .build();
+
+        mockMvc.perform(put("/api/product-masters/{productNo}", savedProduct.getProductNo())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.productCode").value("P-9999"))
+                .andExpect(jsonPath("$.productName").value("수정된상품"));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 productNo면 404를 반환한다")
+    void updateProductMaster_notFound() throws Exception {
+
+        ProductMasterUpdateRequest request =
+                validRequest(savedCategory.getCategoryNo());
+
+        mockMvc.perform(
+                        put("/api/product-masters/{productNo}", 999999L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    @DisplayName("존재하지 않는 categoryNo면 404를 반환한다")
+    void updateProductMaster_categoryNotFound() throws Exception {
+
+        ProductMasterUpdateRequest request =
+                validRequest(999999L);
+
+        mockMvc.perform(
+                        put("/api/product-masters/{productNo}", savedProduct.getProductNo())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 productCode로 변경 시 409를 반환한다")
+    void updateProductMaster_duplicateProductCode() throws Exception {
+
+        productMasterRepository.save(
+                ProductMaster.builder()
+                        .productCode("P-DUP")
+                        .productName("다른상품")
+                        .category(savedCategory)
+                        .price(BigDecimal.valueOf(1000))
+                        .used("Y")
+                        .address("인천")
+                        .productCreated(LocalDate.now())
+                        .build()
+        );
+
+        ProductMasterUpdateRequest request =
+                ProductMasterUpdateRequest.builder()
+                        .categoryNo(savedCategory.getCategoryNo())
+                        .productCode("P-DUP")
+                        .productName("정상상품")
+                        .productCreated(LocalDate.now())
+                        .price(BigDecimal.valueOf(1000))
+                        .used("Y")
+                        .address("경기")
+                        .build();
+
+        mockMvc.perform(
+                        put("/api/product-masters/{productNo}", savedProduct.getProductNo())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isConflict());
+    }
+
+    private ProductMasterUpdateRequest validRequest(Long categoryNo) {
+        return ProductMasterUpdateRequest.builder()
+                .categoryNo(categoryNo)
+                .productCode("P-VALID")
+                .productName("정상상품")
+                .productCreated(LocalDate.now())
+                .price(BigDecimal.valueOf(1000))
+                .used("Y")
+                .address("경기")
+                .build();
     }
 }

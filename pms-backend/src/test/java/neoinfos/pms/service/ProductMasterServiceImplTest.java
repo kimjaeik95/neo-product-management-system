@@ -6,12 +6,14 @@ import neoinfos.pms.common.exception.productmaster.DuplicateProductMasterExcepti
 import neoinfos.pms.common.exception.productmaster.ProductMasterNotFoundException;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
+import neoinfos.pms.dto.ProductMasterUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.entity.ProductMaster;
 import neoinfos.pms.mapper.ProductMasterMapper;
 import neoinfos.pms.repository.CategoryRepository;
 import neoinfos.pms.repository.ProductMasterRepository;
 import org.assertj.core.api.AbstractThrowableAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -56,6 +59,10 @@ class ProductMasterServiceImplTest {
     private ProductMasterRepository productMasterRepository;
     @Mock private CategoryRepository categoryRepository;
     @Mock private ProductMasterMapper productMasterMapper;
+
+    private ProductMaster productMaster;
+    private Category category;
+    private ProductMasterUpdateRequest updateRequest;
 
     // ProductMaster 생성
     @Test
@@ -238,5 +245,96 @@ class ProductMasterServiceImplTest {
                 .isInstanceOf(ProductMasterNotFoundException.class);
 
         verify(productMasterMapper, never()).toDto(any());
+    }
+
+    // ProductMaster 업데이트
+    @BeforeEach
+    void setUp() {
+        category = Category.builder().categoryNo(1L).build();
+        productMaster = ProductMaster.builder()
+                .productNo(100L)
+                .productCode("OLD-CODE")
+                .category(category)
+                .build();
+
+        updateRequest = ProductMasterUpdateRequest.builder()
+                .categoryNo(1L)
+                .productCode("NEW-CODE")
+                .productName("변경된 상품명")
+                .productCreated(LocalDate.now())
+                .price(BigDecimal.valueOf(1000))
+                .used("N")
+                .address("서울시 강남구")
+                .build();
+    }
+
+    @Test
+    @DisplayName("정상적으로 상품 정보를 수정한다")
+    void updateProductMasterById_success() {
+        given(productMasterRepository.findById(100L)).willReturn(Optional.of(productMaster));
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(category));
+        given(productMasterRepository.existsByProductCode("NEW-CODE")).willReturn(false);
+        given(productMasterMapper.toDto(productMaster)).willReturn(mock(ProductMasterResponse.class));
+
+        ProductMasterResponse response = productMasterService.updateProductMasterById(100L, updateRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(productMaster.getProductCode()).isEqualTo("NEW-CODE");
+        assertThat(productMaster.getProductName()).isEqualTo("변경된 상품명");
+        verify(productMasterRepository, never()).save(any()); // dirty checking으로 처리되는지 확인
+    }
+
+    @Test
+    @DisplayName("상품이 존재하지 않으면 ProductMasterNotFoundException을 던진다")
+    void updateProductMasterById_productNotFound() {
+        given(productMasterRepository.findById(100L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productMasterService.updateProductMasterById(100L, updateRequest))
+                .isInstanceOf(ProductMasterNotFoundException.class);
+
+        verify(categoryRepository, never()).findById(any());
+    }
+
+    @Test
+    @DisplayName("카테고리가 존재하지 않으면 CategoryNotFoundException을 던진다")
+    void updateProductMasterById_categoryNotFound() {
+        given(productMasterRepository.findById(100L)).willReturn(Optional.of(productMaster));
+        given(categoryRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productMasterService.updateProductMasterById(100L, updateRequest))
+                .isInstanceOf(CategoryNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("변경하려는 productCode가 이미 존재하면 DuplicateProductMasterException을 던진다")
+    void updateProductMasterById_duplicateProductCode() {
+        given(productMasterRepository.findById(100L)).willReturn(Optional.of(productMaster));
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(category));
+        given(productMasterRepository.existsByProductCode("NEW-CODE")).willReturn(true);
+
+        assertThatThrownBy(() -> productMasterService.updateProductMasterById(100L, updateRequest))
+                .isInstanceOf(DuplicateProductMasterException.class);
+    }
+
+    @Test
+    @DisplayName("productCode를 변경하지 않으면 중복 체크를 하지 않고 정상 처리된다")
+    void updateProductMasterById_sameProductCode_noDuplicateCheck() {
+        updateRequest = ProductMasterUpdateRequest.builder()
+                .categoryNo(1L)
+                .productCode("OLD-CODE")
+                .productName("변경된 상품명")
+                .productCreated(LocalDate.now())
+                .price(BigDecimal.valueOf(1000))
+                .used("Y")
+                .address("서울시 은평구")
+                .build();
+
+        given(productMasterRepository.findById(100L)).willReturn(Optional.of(productMaster));
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(category));
+        given(productMasterMapper.toDto(productMaster)).willReturn(mock(ProductMasterResponse.class));
+
+        productMasterService.updateProductMasterById(100L, updateRequest);
+
+        verify(productMasterRepository, never()).existsByProductCode(any());
     }
 }

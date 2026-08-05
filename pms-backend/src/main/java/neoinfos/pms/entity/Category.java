@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import neoinfos.pms.dto.CategoryUpdateRequest;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
@@ -72,10 +73,10 @@ public class Category {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public void updateCategory(String categoryCode, String categoryName, String used) {
-        this.categoryCode = categoryCode;
-        this.categoryName = categoryName;
-        this.used = used;
+    public void updateCategory(CategoryUpdateRequest updateRequest) {
+        this.categoryCode = updateRequest.getCategoryCode();
+        this.categoryName = updateRequest.getCategoryName();
+        this.used = updateRequest.getUsed();
     }
 
     public void softDelete() {

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
+import neoinfos.pms.dto.ProductMasterUpdateRequest;
 import neoinfos.pms.service.ProductMasterService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 /**
  * packageName    : neoinfos.pms.controller
@@ -51,5 +52,11 @@ public class ProductMasterController {
     public ResponseEntity<ProductMasterResponse> getProductMaster(@PathVariable("productNo") Long productNo) {
         ProductMasterResponse productMasterById = productMasterService.findProductMasterById(productNo);
         return ResponseEntity.ok().body(productMasterById);
+    }
+
+    @PutMapping("/product-masters/{productNo}")
+    public ResponseEntity<ProductMasterResponse> updateProductMasterById(@PathVariable("productNo") Long productNo,@Valid @RequestBody ProductMasterUpdateRequest updateRequest) {
+        ProductMasterResponse productMasterResponse = productMasterService.updateProductMasterById(productNo, updateRequest);
+        return ResponseEntity.ok().body(productMasterResponse);
     }
 }

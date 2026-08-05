@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import neoinfos.pms.dto.ProductMasterUpdateRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -87,4 +88,13 @@ public class ProductMaster {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    public void updateProductMaster(ProductMasterUpdateRequest updateRequest, Category category) {
+        this.category = category;
+        this.productCode = updateRequest.getProductCode();
+        this.productName = updateRequest.getProductName();
+        this.productCreated = updateRequest.getProductCreated();
+        this.price = updateRequest.getPrice();
+        this.used = updateRequest.getUsed();
+        this.address = updateRequest.getAddress();
+    }
 }

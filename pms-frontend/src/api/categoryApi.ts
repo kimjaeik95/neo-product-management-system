@@ -1,11 +1,11 @@
 import type { Category, CategoryCreateRequest, CategoryUpdatedRequest } from '@/types/category'
 import http from './http'
-
+import type { PageResponse } from '@/types/common'
 export const categoryApi = {
-  list(): Promise<Category[]> {
-    return http.get('/categories').then((res) => res.data)
+  // GET /categories?page=0&size=20  (Pageable)
+  list(page = 0, size = 20): Promise<PageResponse<Category>> {
+    return http.get('/categories', { params: { page, size } }).then((res) => res.data)
   },
-
   get(categoryNo: number): Promise<Category> {
     return http.get(`/categories/${categoryNo}`).then((res) => res.data)
   },

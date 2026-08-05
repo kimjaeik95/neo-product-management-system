@@ -1,8 +1,6 @@
 package neoinfos.pms.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
-
 /**
  * packageName    : neoinfos.pms.config.properties
  * fileName       : CorsProperties

@@ -3,6 +3,7 @@ package neoinfos.pms.service;
 import neoinfos.pms.common.exception.category.CategoryNotFoundException;
 import neoinfos.pms.common.exception.productmaster.DuplicateProductMasterException;
 import neoinfos.pms.common.exception.productmaster.ProductMasterNotFoundException;
+import neoinfos.pms.dto.ProductMasterListProjection;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.dto.ProductMasterUpdateRequest;
@@ -25,10 +26,11 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -133,17 +135,17 @@ class ProductMasterServiceImplTest {
                 .categoryName("전자기기")
                 .build();
 
-        ProductMaster product1 = ProductMaster.builder()
-                .category(category)
+        ProductMasterListProjection product1 = ProductMasterListProjection.builder()
                 .productCode("P001")
                 .productName("노트북")
                 .productCreated(LocalDate.of(2026, 8, 1))
                 .price(new BigDecimal("1000000"))
                 .address("서울")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
-        ProductMaster product2 = ProductMaster.builder()
-                .category(category)
+        ProductMasterListProjection product2 = ProductMasterListProjection.builder()
                 .productCode("P002")
                 .productName("마우스")
                 .productCreated(LocalDate.of(2026, 8, 2))
@@ -154,7 +156,7 @@ class ProductMasterServiceImplTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<ProductMaster> productPage = new PageImpl<>(
+        Page<ProductMasterListProjection> productPage = new PageImpl<>(
                 List.of(product1, product2),
                 pageable,
                 2
@@ -172,20 +174,17 @@ class ProductMasterServiceImplTest {
                 .build();
 
 
-        given(productMasterRepository.findAll(pageable)).willReturn(productPage);
-        given(productMasterMapper.toDto(product1)).willReturn(response1);
-        given(productMasterMapper.toDto(product2)).willReturn(response2);
-
+        given(productMasterRepository.findProductList(pageable)).willReturn(productPage);
 
         // when
-        Page<ProductMasterResponse> result = productMasterService.findALLProductMasters(pageable);
+        Page<ProductMasterListProjection> result = productMasterService.findALLProductMasters(pageable);
 
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(2);
         assertThat(result.getNumber()).isEqualTo(0);
         assertThat(result.getSize()).isEqualTo(10);
-        verify(productMasterRepository).findAll(pageable);
+        verify(productMasterRepository).findProductList(pageable);
     }
 
     // ProductMaster 단건 조회
@@ -357,4 +356,69 @@ class ProductMasterServiceImplTest {
         assertThatThrownBy(() -> productMasterService.softDeleteById(100L))
                 .isInstanceOf(ProductMasterNotFoundException.class);
     }
+
+    // 제품분류에속한 제품마스터 조회
+    @Test
+    @DisplayName("제품분류 번호로 제품 목록 조회 성공")
+    void findByProductMastersByCategoryNo_success() {
+
+        // given
+        Long categoryNo = 1L;
+
+        Category category = Category.builder()
+                .categoryNo(categoryNo)
+                .categoryName("전자제품")
+                .build();
+
+
+        ProductMaster productMaster = ProductMaster.builder()
+                .productNo(1L)
+                .productName("노트북")
+                .category(category)
+                .build();
+
+
+        ProductMasterResponse response =
+                ProductMasterResponse.builder()
+                        .productNo(1L)
+                        .productName("노트북")
+                        .categoryName("전자제품")
+                        .build();
+
+
+        given(categoryRepository.findById(categoryNo)).willReturn(Optional.of(category));
+        given(productMasterRepository.findByCategoryIdWithCategory(categoryNo)).willReturn(List.of(productMaster));
+        given(productMasterMapper.toDto(productMaster)).willReturn(response);
+        
+        // when
+        List<ProductMasterResponse> result = productMasterService.findByProductMastersByCategoryNo(categoryNo);
+        
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getProductName())
+                .isEqualTo("노트북");
+        
+        verify(categoryRepository).findById(categoryNo);
+        verify(productMasterRepository).findByCategoryIdWithCategory(categoryNo);
+
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 카테고리 조회 시 예외 발생")
+    void findByProductMastersByCategoryNo_categoryNotFound() {
+
+        // given
+        Long categoryNo = 999L;
+
+        given(categoryRepository.findById(categoryNo))
+                .willReturn(Optional.empty());
+
+        // when & then
+
+        assertThatThrownBy(() -> productMasterService.findByProductMastersByCategoryNo(categoryNo))
+                .isInstanceOf(CategoryNotFoundException.class);
+
+        verify(productMasterRepository, never()).findByCategoryIdWithCategory(categoryNo);
+    }
 }
+

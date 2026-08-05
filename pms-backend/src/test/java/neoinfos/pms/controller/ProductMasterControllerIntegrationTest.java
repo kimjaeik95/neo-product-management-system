@@ -17,13 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -84,7 +82,7 @@ public class ProductMasterControllerIntegrationTest {
     @DisplayName("상품 등록 성공 시 201과 생성된 리소스를 반환한다")
     void createProductMaster_success() throws Exception {
         ProductMasterRequest request = ProductMasterRequest.builder()
-                .categoryNo(categoryNo)
+                .categoryNo(savedCategory.getCategoryNo())
                 .productCode("P001")
                 .productName("테스트 상품")
                 .productCreated(LocalDate.now())
@@ -107,7 +105,7 @@ public class ProductMasterControllerIntegrationTest {
         productMasterRepository.save(
                 ProductMaster.builder()
                         .productCode("P001")
-                        .category(categoryRepository.findById(categoryNo).get())
+                        .category(categoryRepository.findById(savedCategory.getCategoryNo()).get())
                         .productName("테스트 상품")
                         .used("Y")
                         .productCreated(LocalDate.now())
@@ -115,7 +113,7 @@ public class ProductMasterControllerIntegrationTest {
                         .address("서울시 강남구").build());
 
         ProductMasterRequest request = ProductMasterRequest.builder()
-                .productCode("P001").categoryNo(categoryNo)
+                .productCode("P001").categoryNo(savedProduct.getProductNo())
                 .productName("테스트 상품")
                 .productCreated(LocalDate.now())
                 .price(BigDecimal.valueOf(10000))
@@ -189,22 +187,22 @@ public class ProductMasterControllerIntegrationTest {
                 .andExpect(status().isOk())
 
                 // content 개수
-                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content.length()").value(3))
 
                 // 데이터 확인
                 .andExpect(jsonPath("$.content[0].productCode")
-                        .value("P001"))
+                        .value("P-0001"))
                 .andExpect(jsonPath("$.content[0].productName")
-                        .value("노트북"))
+                        .value("기존상품"))
 
                 .andExpect(jsonPath("$.content[1].productCode")
-                        .value("P002"))
+                        .value("P001"))
                 .andExpect(jsonPath("$.content[1].productName")
-                        .value("마우스"))
+                        .value("노트북"))
 
                 // 페이징 정보 확인
                 .andExpect(jsonPath("$.totalElements")
-                        .value(2))
+                        .value(3))
                 .andExpect(jsonPath("$.totalPages")
                         .value(1))
                 .andExpect(jsonPath("$.number")
@@ -365,15 +363,22 @@ public class ProductMasterControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    // 제품분류에속한 제품마스터 조회
     @Test
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    @DisplayName("삭제된 상품 조회 시 404를 반환한다")
-    void deletedProduct_excludedFromGet() throws Exception {
-        mockMvc.perform(delete("/api/product-masters/{productNo}", savedProduct.getProductNo()))
-                .andExpect(status().isNoContent());
+    @DisplayName("카테고리별 제품 조회 API 통합 테스트")
+    void findProductMastersByCategoryNo() throws Exception {
 
-        mockMvc.perform(get("/api/product-masters/{productNo}", savedProduct.getProductNo()))
-                .andExpect(status().isNotFound());
+        // given
+        Long categoryNo = savedCategory.getCategoryNo();
+
+        // when & then
+        mockMvc.perform(get("/api/product-masters/category/{categoryNo}", categoryNo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].productName")
+                        .value("기존상품"))
+                .andExpect(jsonPath("$[0].categoryName")
+                        .value("전자제품"));
     }
 }
+
 

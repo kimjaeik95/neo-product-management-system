@@ -102,9 +102,14 @@ public class CategoryControllerIntegrationTest {
         // when & then
         mockMvc.perform(get("/api/categories"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].categoryCode")
-                        .value(hasItems("CATE001", "CATE002")));
+                .andExpect(jsonPath("$.content[*].categoryCode")
+                        .value(hasItems("CATE001", "CATE002")))
+                .andExpect(jsonPath("$.totalElements")
+                        .value(2))
+                .andExpect(jsonPath("$.totalPages")
+                        .value(1));
     }
+
 
     // category 단건 조회
     @Test

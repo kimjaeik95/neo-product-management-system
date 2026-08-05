@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import neoinfos.pms.entity.Category;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

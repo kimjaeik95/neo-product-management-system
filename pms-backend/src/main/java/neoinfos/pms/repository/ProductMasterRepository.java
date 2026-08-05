@@ -1,7 +1,6 @@
 package neoinfos.pms.repository;
 
 import neoinfos.pms.dto.ProductMasterListProjection;
-import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.entity.ProductMaster;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

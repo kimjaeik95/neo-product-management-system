@@ -1,6 +1,7 @@
 package neoinfos.pms.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
  * 8/6/26        JAEIK       최초 생성
  */
 @Getter
+@Builder
 @AllArgsConstructor
 public class ProductMasterListProjection {
     private Long productNo;

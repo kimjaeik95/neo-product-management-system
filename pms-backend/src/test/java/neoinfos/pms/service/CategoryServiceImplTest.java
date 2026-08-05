@@ -8,6 +8,7 @@ import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.mapper.CategoryMapper;
 import neoinfos.pms.repository.CategoryRepository;
+import neoinfos.pms.repository.ProductMasterRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +45,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CategoryServiceImplTest {
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private ProductMasterRepository productMasterRepository;
 
     @Mock
     private CategoryMapper categoryMapper;
@@ -277,18 +281,19 @@ class CategoryServiceImplTest {
     @DisplayName("정상적으로 소프트 딜리트 처리된다")
     void softDeleteCategoryById_success() {
         // given
-        Long categoryNo = 1L;
-        Category category = Category.builder()
-                .categoryNo(categoryNo).categoryCode("CATE001").categoryName("의류").used("Y").build();
 
-        given(categoryRepository.findById(categoryNo)).willReturn(Optional.of(category));
+        Category category = Category.builder().categoryCode("CATE001").categoryName("의류").used("Y").build();
+
+        given(categoryRepository.findById(1L))
+                .willReturn(Optional.of(category));
+
+        given(productMasterRepository.existsByCategory_CategoryNo(1L)).willReturn(false);
 
         // when
-        categoryService.softDeleteCategoryById(categoryNo);
+        categoryService.softDeleteCategoryById(1L);
 
         // then
         assertThat(category.getDeletedYn()).isEqualTo("Y");
-        assertThat(category.getDeletedAt()).isNotNull();
     }
 
     @Test

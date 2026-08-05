@@ -3,7 +3,6 @@ package neoinfos.pms.config;
 import lombok.RequiredArgsConstructor;
 import neoinfos.pms.config.properties.CorsProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 

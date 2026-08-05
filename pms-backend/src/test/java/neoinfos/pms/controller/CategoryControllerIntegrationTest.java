@@ -201,12 +201,12 @@ public class CategoryControllerIntegrationTest {
                 .andExpect(status().isNoContent());
 
         // @SQLRestriction 때문에 기본 findById로는 조회 안 됨  (네이티브 쿼리로 직접 검증)
-        Object deletedYn =  em.createNativeQuery(
+        Object deletedYn = em.createNativeQuery(
                         """
-                        SELECT deleted_yn
-                        FROM category
-                        WHERE category_no = :no
-                        """
+                                SELECT deleted_yn
+                                FROM category
+                                WHERE category_no = :no
+                                """
                 )
                 .setParameter("no", saved.getCategoryNo())
                 .getSingleResult();

@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import neoinfos.pms.dto.ProductMasterUpdateRequest;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
+@SQLRestriction("deleted_yn = 'N'")
 @Table(name = "product_master")
 public class ProductMaster {
 
@@ -96,5 +98,10 @@ public class ProductMaster {
         this.price = updateRequest.getPrice();
         this.used = updateRequest.getUsed();
         this.address = updateRequest.getAddress();
+    }
+
+    public void softDelete() {
+        this.deletedYn = "Y";
+        this.deletedAt = LocalDateTime.now();
     }
 }

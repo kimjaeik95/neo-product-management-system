@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
@@ -62,6 +63,7 @@ public class ProductMasterControllerIntegrationTest {
 
     private ProductMaster savedProduct;
     private Category savedCategory;
+
     @BeforeEach
     void setUp() {
         savedCategory = categoryRepository.save(Category.builder().categoryCode("TEST-001").categoryName("전자제품").used("Y").build());
@@ -343,4 +345,35 @@ public class ProductMasterControllerIntegrationTest {
                 .address("경기")
                 .build();
     }
+
+    // ProductMaster 삭제
+    @Test
+    @DisplayName("DELETE /product-masters/{productNo} - 정상 삭제 시 204를 반환한다")
+    void deleteProductMaster_success() throws Exception {
+        mockMvc.perform(delete("/api/product-masters/{productNo}", savedProduct.getProductNo()))
+                .andExpect(status().isNoContent());
+
+        ProductMaster deleted = productMasterRepository.findById(savedProduct.getProductNo())
+                .orElseThrow();
+        assertThat(deleted.getDeletedYn()).isEqualTo("Y");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 productNo면 404를 반환한다")
+    void deleteProductMaster_notFound() throws Exception {
+        mockMvc.perform(delete("/api/product-masters/{productNo}", 999999L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @DisplayName("삭제된 상품 조회 시 404를 반환한다")
+    void deletedProduct_excludedFromGet() throws Exception {
+        mockMvc.perform(delete("/api/product-masters/{productNo}", savedProduct.getProductNo()))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/product-masters/{productNo}", savedProduct.getProductNo()))
+                .andExpect(status().isNotFound());
+    }
 }
+

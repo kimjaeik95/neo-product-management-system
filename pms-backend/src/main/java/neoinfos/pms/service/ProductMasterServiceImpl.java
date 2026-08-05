@@ -93,4 +93,13 @@ public class ProductMasterServiceImpl implements ProductMasterService{
 
         return productMasterMapper.toDto(productMaster);
     }
+
+    @Override
+    @Transactional
+    public void softDeleteById(Long productNo) {
+        ProductMaster productMaster = productMasterRepository.findById(productNo)
+                .orElseThrow(() -> new ProductMasterNotFoundException(productNo));
+
+        productMaster.softDelete();
+    }
 }

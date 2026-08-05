@@ -24,4 +24,6 @@ public interface ProductMasterService {
     ProductMasterResponse findProductMasterById(Long productNo);
 
     ProductMasterResponse updateProductMasterById(Long productNo, ProductMasterUpdateRequest updateRequest);
+
+    void softDeleteById(Long productNo);
 }

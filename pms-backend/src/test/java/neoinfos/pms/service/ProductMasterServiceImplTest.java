@@ -1,6 +1,5 @@
 package neoinfos.pms.service;
 
-import com.sun.jdi.request.DuplicateRequestException;
 import neoinfos.pms.common.exception.category.CategoryNotFoundException;
 import neoinfos.pms.common.exception.productmaster.DuplicateProductMasterException;
 import neoinfos.pms.common.exception.productmaster.ProductMasterNotFoundException;
@@ -12,7 +11,6 @@ import neoinfos.pms.entity.ProductMaster;
 import neoinfos.pms.mapper.ProductMasterMapper;
 import neoinfos.pms.repository.CategoryRepository;
 import neoinfos.pms.repository.ProductMasterRepository;
-import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -57,8 +54,10 @@ class ProductMasterServiceImplTest {
 
     @Mock
     private ProductMasterRepository productMasterRepository;
-    @Mock private CategoryRepository categoryRepository;
-    @Mock private ProductMasterMapper productMasterMapper;
+    @Mock
+    private CategoryRepository categoryRepository;
+    @Mock
+    private ProductMasterMapper productMasterMapper;
 
     private ProductMaster productMaster;
     private Category category;
@@ -92,6 +91,7 @@ class ProductMasterServiceImplTest {
         assertThat(result).isEqualTo(expected);
         verify(productMasterRepository).save(entity);
     }
+
     @Test
     @DisplayName("이미 존재하는 상품코드면 DuplicateProductMasterException 던진다")
     void createProductMaster_duplicateProductCode() {
@@ -336,5 +336,26 @@ class ProductMasterServiceImplTest {
         productMasterService.updateProductMasterById(100L, updateRequest);
 
         verify(productMasterRepository, never()).existsByProductCode(any());
+    }
+
+    // ProductMaster 삭제
+    @Test
+    @DisplayName("존재하는 상품을 소프트 삭제한다")
+    void softDeleteById_success() {
+        ProductMaster productMaster = mock(ProductMaster.class);
+        given(productMasterRepository.findById(100L)).willReturn(Optional.of(productMaster));
+
+        productMasterService.softDeleteById(100L);
+
+        verify(productMaster).softDelete();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 상품이면 ProductMasterNotFoundException을 던진다")
+    void softDeleteById_notFound() {
+        given(productMasterRepository.findById(100L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productMasterService.softDeleteById(100L))
+                .isInstanceOf(ProductMasterNotFoundException.class);
     }
 }

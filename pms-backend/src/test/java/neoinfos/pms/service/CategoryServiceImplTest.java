@@ -1,6 +1,5 @@
 package neoinfos.pms.service;
 
-import com.sun.jdi.request.DuplicateRequestException;
 import neoinfos.pms.common.exception.category.CategoryNotFoundException;
 import neoinfos.pms.common.exception.category.DuplicateCategoryCodeException;
 import neoinfos.pms.dto.CategoryRequest;
@@ -17,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;

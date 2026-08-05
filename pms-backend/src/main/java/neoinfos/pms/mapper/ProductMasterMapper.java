@@ -1,5 +1,6 @@
 package neoinfos.pms.mapper;
 
+import lombok.extern.slf4j.Slf4j;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.entity.Category;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
  * 8/4/26        JAEIK       최초 생성
  */
 @Component
+@Slf4j
 public class ProductMasterMapper {
 
     public ProductMaster toEntity(ProductMasterRequest masterRequest, Category category) {
@@ -33,9 +35,11 @@ public class ProductMasterMapper {
     }
 
     public ProductMasterResponse toDto(ProductMaster productMaster) {
+        log.info("N + 1 테스트 category = " + productMaster.getCategory().getCategoryNo());
         return ProductMasterResponse.builder()
-                .productNo(productMaster.getProductNo())
                 .categoryNo(productMaster.getCategory().getCategoryNo())
+                .categoryName(productMaster.getCategory().getCategoryName())
+                .productNo(productMaster.getProductNo())
                 .productCode(productMaster.getProductCode())
                 .productName(productMaster.getProductName())
                 .productCreated(productMaster.getProductCreated())

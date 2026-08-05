@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import neoinfos.pms.common.exception.category.CategoryNotFoundException;
 import neoinfos.pms.common.exception.productmaster.DuplicateProductMasterException;
 import neoinfos.pms.common.exception.productmaster.ProductMasterNotFoundException;
+import neoinfos.pms.dto.ProductMasterListProjection;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.dto.ProductMasterUpdateRequest;
@@ -61,9 +62,8 @@ public class ProductMasterServiceImpl implements ProductMasterService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductMasterResponse> findALLProductMasters(Pageable pageable) {
-        return productMasterRepository.findAll(pageable)
-                .map(productMasterMapper::toDto);
+    public Page<ProductMasterListProjection> findALLProductMasters(Pageable pageable) {
+        return productMasterRepository.findProductList(pageable);
     }
 
     @Override

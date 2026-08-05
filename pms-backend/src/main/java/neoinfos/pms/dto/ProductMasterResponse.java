@@ -31,6 +31,8 @@ public class ProductMasterResponse {
 
     private Long categoryNo;
 
+    private String categoryName;
+
     private String productCode;
 
     private String productName;

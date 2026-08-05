@@ -1,5 +1,6 @@
 package neoinfos.pms.service;
 
+import neoinfos.pms.dto.ProductMasterListProjection;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.dto.ProductMasterUpdateRequest;
@@ -19,7 +20,7 @@ import org.springframework.data.domain.Pageable;
  */
 public interface ProductMasterService {
     ProductMasterResponse createProductMaster(ProductMasterRequest productMasterRequest);
-    Page<ProductMasterResponse> findALLProductMasters(Pageable pageable);
+    Page<ProductMasterListProjection> findALLProductMasters(Pageable pageable);
 
     ProductMasterResponse findProductMasterById(Long productNo);
 

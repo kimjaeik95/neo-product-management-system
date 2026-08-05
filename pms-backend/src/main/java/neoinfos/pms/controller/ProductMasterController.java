@@ -2,6 +2,7 @@ package neoinfos.pms.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import neoinfos.pms.dto.ProductMasterListProjection;
 import neoinfos.pms.dto.ProductMasterRequest;
 import neoinfos.pms.dto.ProductMasterResponse;
 import neoinfos.pms.dto.ProductMasterUpdateRequest;
@@ -44,8 +45,8 @@ public class ProductMasterController {
     }
 
     @GetMapping("/product-masters")
-    public ResponseEntity<Page<ProductMasterResponse>> getProductMasters(@PageableDefault(size = 20) Pageable pageable) {
-        Page<ProductMasterResponse> productMasters = productMasterService.findALLProductMasters(pageable);
+    public ResponseEntity<Page<ProductMasterListProjection>> getProductMasters(@PageableDefault(size = 20) Pageable pageable) {
+        Page<ProductMasterListProjection> productMasters = productMasterService.findALLProductMasters(pageable);
         return ResponseEntity.ok().body(productMasters);
     }
 

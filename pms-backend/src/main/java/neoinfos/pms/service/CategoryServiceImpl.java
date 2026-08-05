@@ -9,6 +9,8 @@ import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.mapper.CategoryMapper;
 import neoinfos.pms.repository.CategoryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,12 +50,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryResponse> findAllCategory() {
-        List<Category> categories = categoryRepository.findAll();
-
-        return categories.stream()
-                .map(categoryMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<CategoryResponse> findAllCategory(Pageable pageable) {
+        return categoryRepository.findAll(pageable)
+                .map(categoryMapper::toDto);
     }
 
     @Override

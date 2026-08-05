@@ -3,6 +3,8 @@ package neoinfos.pms.service;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
 import neoinfos.pms.dto.CategoryUpdateRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,7 +22,7 @@ import java.util.List;
 public interface CategoryService {
     CategoryResponse createCategory(CategoryRequest categoryRequest);
 
-    List<CategoryResponse> findAllCategory();
+    Page<CategoryResponse> findAllCategory(Pageable pageable);
 
     CategoryResponse findCategoryById(Long categoryNo);
 

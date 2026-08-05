@@ -14,6 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -119,22 +123,52 @@ class CategoryServiceImplTest {
     @DisplayName("제품분류 목록을 반환한다")
     void findAllCategory_success() {
         // given
-        Category category1 = Category.builder().categoryCode("CATE001").categoryName("의류").build();
-        Category category2 = Category.builder().categoryCode("CATE002").categoryName("잡화").build();
+        Category category1 = Category.builder()
+                .categoryCode("CATE001")
+                .categoryName("의류")
+                .build();
 
-        CategoryResponse response1 = CategoryResponse.builder().categoryCode("CATE001").categoryName("의류").build();
-        CategoryResponse response2 = CategoryResponse.builder().categoryCode("CATE002").categoryName("잡화").build();
+        Category category2 = Category.builder()
+                .categoryCode("CATE002")
+                .categoryName("잡화")
+                .build();
 
-        given(categoryRepository.findAll()).willReturn(List.of(category1, category2));
-        given(categoryMapper.toDto(category1)).willReturn(response1);
-        given(categoryMapper.toDto(category2)).willReturn(response2);
+        CategoryResponse response1 = CategoryResponse.builder()
+                .categoryCode("CATE001")
+                .categoryName("의류")
+                .build();
+
+        CategoryResponse response2 = CategoryResponse.builder()
+                .categoryCode("CATE002")
+                .categoryName("잡화")
+                .build();
+
+        Page<Category> categoryPage = new PageImpl<>(
+                List.of(category1, category2),
+                PageRequest.of(0, 10),
+                2
+        );
+
+        given(categoryRepository.findAll(any(Pageable.class)))
+                .willReturn(categoryPage);
+
+        given(categoryMapper.toDto(category1))
+                .willReturn(response1);
+
+        given(categoryMapper.toDto(category2))
+                .willReturn(response2);
 
         // when
-        List<CategoryResponse> result = categoryService.findAllCategory();
+        Page<CategoryResponse> result = categoryService.findAllCategory(PageRequest.of(0, 20));
 
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result).extracting("categoryCode").containsExactly("CATE001", "CATE002");
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent())
+                .extracting("categoryCode")
+                .containsExactly("CATE001", "CATE002");
+
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getTotalPages()).isEqualTo(1);
     }
 
     // category 단건 조회

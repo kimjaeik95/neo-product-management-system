@@ -6,6 +6,9 @@ import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
 import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.service.CategoryService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,9 +46,9 @@ public class CategoryController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<List<CategoryResponse>> getCategories() {
-        List<CategoryResponse> category = categoryService.findAllCategory();
-        return ResponseEntity.ok().body(category);
+    public ResponseEntity<Page<CategoryResponse>> getCategories(@PageableDefault(size = 20) Pageable pageable) {
+        Page<CategoryResponse> pageCategory = categoryService.findAllCategory(pageable);
+        return ResponseEntity.ok().body(pageCategory);
     }
 
     @GetMapping("/categories/{categoryNo}")

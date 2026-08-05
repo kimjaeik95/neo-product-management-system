@@ -2,6 +2,7 @@ package neoinfos.pms.service;
 
 import lombok.RequiredArgsConstructor;
 import neoinfos.pms.common.exception.category.CategoryNotFoundException;
+import neoinfos.pms.common.exception.category.CategoryUsedException;
 import neoinfos.pms.common.exception.category.DuplicateCategoryCodeException;
 import neoinfos.pms.dto.CategoryRequest;
 import neoinfos.pms.dto.CategoryResponse;
@@ -9,6 +10,7 @@ import neoinfos.pms.dto.CategoryUpdateRequest;
 import neoinfos.pms.entity.Category;
 import neoinfos.pms.mapper.CategoryMapper;
 import neoinfos.pms.repository.CategoryRepository;
+import neoinfos.pms.repository.ProductMasterRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ProductMasterRepository productMasterRepository;
 
     @Override
     @Transactional
@@ -88,6 +91,10 @@ public class CategoryServiceImpl implements CategoryService {
     public void softDeleteCategoryById(Long categoryNo) {
         Category category = categoryRepository.findById(categoryNo)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryNo));
+
+        if (productMasterRepository.existsByCategory_CategoryNo(categoryNo)) {
+            throw new CategoryUsedException();
+        }
 
         category.softDelete();
     }

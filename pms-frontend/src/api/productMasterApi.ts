@@ -16,7 +16,7 @@ export const productMasterApi = {
   },
 
   create(payload: ProductMasterRequest): Promise<ProductMaster> {
-    return http.post('product-masters', payload).then((res) => res.data)
+    return http.post('/product-masters', payload).then((res) => res.data)
   },
 
   update(productNo: number, payload: ProductMasterUpdateRequest): Promise<ProductMaster> {
@@ -25,5 +25,9 @@ export const productMasterApi = {
 
   remove(productNo: number): Promise<void> {
     return http.delete(`/product-masters/${productNo}`).then(() => undefined)
+  },
+
+  findByCategoryNo(categoryNo: number): Promise<ProductMaster[]> {
+    return http.get(`/product-masters/category/${categoryNo}`).then((res) => res.data)
   },
 }

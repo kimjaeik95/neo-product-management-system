@@ -9,6 +9,7 @@ import { ref } from 'vue'
 
 export const useProductMasterStore = defineStore('productMaster', () => {
   const list = ref<ProductMaster[]>([])
+  const categoryItems = ref<ProductMaster[]>([])
   const loading = ref(false)
   const errorMessage = ref('')
 
@@ -52,6 +53,21 @@ export const useProductMasterStore = defineStore('productMaster', () => {
     await fetchList(page.value)
   }
 
+  async function fetchByCategoryNo(categoryNo: number) {
+    loading.value = true
+    errorMessage.value = ''
+
+    try {
+      const result = await productMasterApi.findByCategoryNo(categoryNo)
+      categoryItems.value = result
+    } catch (e) {
+      errorMessage.value = '제품분류별 제품 조회에 실패했습니다.'
+      categoryItems.value = []
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     list,
     loading,
@@ -64,5 +80,7 @@ export const useProductMasterStore = defineStore('productMaster', () => {
     updateProductMaster,
     deleteProductMaster,
     fetchProductMaster,
+    categoryItems,
+    fetchByCategoryNo,
   }
 })

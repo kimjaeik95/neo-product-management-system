@@ -1,5 +1,6 @@
 export interface ProductMaster {
   categoryNo: number
+  categoryName: string
   productNo: number
   productCode: string
   productName: string

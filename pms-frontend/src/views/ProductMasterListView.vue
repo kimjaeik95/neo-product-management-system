@@ -2,9 +2,17 @@
   <div>
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="h4 m-0">제품마스터 목록</h2>
-      <router-link to="/product-masters/new">
-        <button class="btn btn-primary btn-sm">+ 신규 등록</button>
-      </router-link>
+
+      <div class="d-flex gap-2">
+        <!-- 제품분류 화면으로 이동하는 버튼 추가 -->
+        <router-link to="/categories">
+          <button class="btn btn-outline-secondary btn-sm">제품분류 목록</button>
+        </router-link>
+
+        <router-link to="/product-masters/new">
+          <button class="btn btn-primary btn-sm">+ 신규 등록</button>
+        </router-link>
+      </div>
     </div>
     <div v-if="store.loading" class="text-muted">불러오는 중...</div>
     <div v-else-if="store.errorMessage" class="alert alert-danger">{{ store.errorMessage }}</div>
@@ -22,6 +30,8 @@
 <script setup lang="ts">
 import { useProductMasterStore } from '@/stores/productMaster'
 import { onMounted } from 'vue'
+import Pagination from '@/components/Pagination.vue'
+import ProductMasterTable from '@/components/productMasterTable.vue'
 
 const store = useProductMasterStore()
 

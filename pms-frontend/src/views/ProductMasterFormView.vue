@@ -15,7 +15,7 @@
 
       <div class="mb-3">
         <label class="form-label">제품코드</label>
-        <input v-model="form.productCode" class="form-control" :disabled="isEdit" required />
+        <input v-model="form.productCode" class="form-control" required />
       </div>
 
       <div class="mb-3">
@@ -48,7 +48,7 @@
       </div>
 
       <button type="submit" class="btn btn-primary">저장</button>
-      <router-link to="/product-masters">
+      <router-link :to="(route.query.redirect as string) || '/product-masters'">
         <button type="button" class="btn btn-outline-secondary ms-2">목록으로</button>
       </router-link>
     </form>
@@ -107,26 +107,31 @@ async function onSubmit() {
   console.log('현재 form.categoryNo =', form.categoryNo)
   if (form.categoryNo === null) return
 
-  if (isEdit.value && productNo.value) {
-    await store.updateProductMaster(productNo.value, {
-      categoryNo: form.categoryNo,
-      productCode: form.productCode,
-      productName: form.productName,
-      used: form.used,
-      productCreated: form.productCreated || null,
-      price: form.price,
-      address: form.address || null,
-    })
-  } else {
-    await store.createProductMaster({
-      categoryNo: form.categoryNo,
-      productCode: form.productCode,
-      productName: form.productName,
-      productCreated: form.productCreated || null,
-      price: form.price,
-      address: form.address || null,
-    })
+  try {
+    if (isEdit.value && productNo.value) {
+      await store.updateProductMaster(productNo.value, {
+        categoryNo: form.categoryNo,
+        productCode: form.productCode,
+        productName: form.productName,
+        used: form.used,
+        productCreated: form.productCreated || null,
+        price: form.price,
+        address: form.address || null,
+      })
+    } else {
+      await store.createProductMaster({
+        categoryNo: form.categoryNo,
+        productCode: form.productCode,
+        productName: form.productName,
+        productCreated: form.productCreated || null,
+        price: form.price,
+        address: form.address || null,
+      })
+    }
+    const redirect = route.query.redirect as string | undefined
+    router.push(redirect || '/product-masters')
+  } catch (error: any) {
+    alert(error.response?.data?.message ?? '저장 중 오류가 발생했습니다.')
   }
-  router.push('/product-masters')
 }
 </script>

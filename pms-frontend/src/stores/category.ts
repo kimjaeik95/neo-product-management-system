@@ -11,11 +11,20 @@ export const useCategoryStore = defineStore('category', () => {
   // 프론트 측 오류
   const errorMessage = ref('')
 
-  async function fetchList() {
+  // 페이징 관련 상태
+  const page = ref(0)
+  const totalPages = ref(0)
+  const totalElements = ref(0)
+
+  async function fetchList(targetPage = 0) {
     loading.value = true
     errorMessage.value = ''
     try {
-      list.value = await categoryApi.list()
+      const result = await categoryApi.list(targetPage, 20)
+      list.value = result.content
+      page.value = result.number
+      totalPages.value = result.totalPages
+      totalElements.value = result.totalElements
     } catch (e) {
       errorMessage.value = '제품분류 목록을 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.'
     } finally {
@@ -44,6 +53,9 @@ export const useCategoryStore = defineStore('category', () => {
 
   return {
     list,
+    page,
+    totalPages,
+    totalElements,
     loading,
     errorMessage,
     fetchList,

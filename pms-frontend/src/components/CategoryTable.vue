@@ -20,13 +20,21 @@
           </span>
         </td>
         <td>{{ formatDate(item.createdAt) }}</td>
-        <td>{{ formatDate(item.updatedAt) }}</td>
+        <td :class="{ 'text-center': !item.updatedAt }">
+          {{ formatDate(item.updatedAt) }}
+        </td>
         <td class="text-center align-middle text-nowrap">
           <div class="d-inline-flex gap-1">
+            <router-link :to="`/categories/${item.categoryNo}/products`">
+              <button class="btn btn-outline-primary btn-sm">제품 보기</button>
+            </router-link>
+
             <router-link :to="`/categories/${item.categoryNo}/edit`">
               <button class="btn btn-outline-secondary btn-sm">수정</button>
             </router-link>
-            <button class="btn btn-outline-danger btn-sm" @click="onDeleteClick(item)">삭제</button>
+            <button class="btn btn-outline-danger btn-sm" @click="emit('delete', item.categoryNo)">
+              삭제
+            </button>
           </div>
         </td>
       </tr>
@@ -44,14 +52,9 @@ import type { Category } from '@/types/category'
 defineProps<{ items: Category[] }>()
 
 const emit = defineEmits<{ delete: [categoryNo: number] }>()
-function onDeleteClick(item: Category) {
-  if (confirm(`'${item.categoryName}' 분류를 삭제하시겠습니까?`)) {
-    emit('delete', item.categoryNo)
-  }
-}
 
-function formatDate(value: string | null) {
-  if (!value) return ''
+function formatDate(value: string | null | undefined) {
+  if (!value) return '-' // 값이 없으면 '-' 리턴
   return value.replace('T', ' ').substring(0, 16)
 }
 </script>
